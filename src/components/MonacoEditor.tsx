@@ -7,11 +7,11 @@ import React, { useEffect, useRef } from "react";
 monaco.languages.typescript.typescriptDefaults.getEagerModelSync();
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   jsx: monaco.languages.typescript.JsxEmit.React,
-  jsxFactory: "React.createElement",
-  reactNamespace: "React",
+  // jsxFactory: "React.createElement",
+  // reactNamespace: "React",
   allowNonTsExtensions: true,
-  allowJs: true,
-  typeRoots: ["./types"],
+  // allowJs: true,
+  // typeRoots: ["./types"],
   moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
   allowSyntheticDefaultImports: true,
   target: monaco.languages.typescript.ScriptTarget.Latest,
@@ -54,6 +54,7 @@ export default function MonacoEditor(props: {
         "typescript",
         monaco.Uri.parse("file:///index.tsx")
       );
+      model.updateOptions({ tabSize: 2 });
 
       const editor = monaco.editor.create(ref.current, {
         model,
