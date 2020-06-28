@@ -10,10 +10,15 @@
 - [x] Class
 - [x] Object Literal
 - [x] Arrow Function
-- [ ] Interface
-- [ ] `const {} = {}`
-- [ ] `foo!`
+- [x] Interface
+- [x] TypeParameters
+- [x] Generics
+- [x] class implements
+- [x] `import { a as b }`
+- [x] ObjectBindingPattern `const {} = {}`
+- [x] ArrayBindingPattern `const {} = {}`
+- [x] `foo!`
+
+## Icebox
+
 - [ ] decolator
-- [ ] Generics
-- [ ] implements
-- [ ] TypeParameters

@@ -10,10 +10,24 @@ type State = {
   ast: ts.SourceFile;
 };
 
-const code3 = `export interface Sock<T> extends T, U<A> {
+const code_binding = `
+const {a} = {a: 1};
+const [a] = [1];
+`;
+const code_import = `
+import * as x from "./a";
+import { y, z as a } from "./b";
+`;
+
+const code3 = `
+export interface Sock<T> extends T, U<A> {
   color: string;
   foo: () => void;
   bar(a: number): void;
+}
+
+class X<T> extends T implements Y {
+  f<K>() {}
 }
 `;
 
@@ -761,11 +775,11 @@ const Keyword = styled.span\`
 \`;
 
 const Literal = styled.span\`
-  color: rgb(181, 206, 168);
+  color: rgb(181, 206, 168);œ
 \`;
 `;
 
-const code = code3;
+const code = code2;
 
 const initialState = {
   code: code,

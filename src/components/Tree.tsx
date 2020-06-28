@@ -60,7 +60,11 @@ export function Tree({ tree }: { tree: ts.Node }) {
       return (
         <>
           {t.modifiers && <Modifiers modifiers={t.modifiers} />}
-          <Tree tree={t.name} />(
+          <Tree tree={t.name} />
+          {t.typeParameters && (
+            <TypeParameters typeParameters={t.typeParameters} />
+          )}
+          (
           {t.parameters.map((p, i) => {
             return (
               <span key={i}>
@@ -87,6 +91,24 @@ export function Tree({ tree }: { tree: ts.Node }) {
             </>
           )}
         </span>
+      );
+    }
+    case ts.SyntaxKind.ArrayBindingPattern: {
+      const t = tree as ts.ArrayBindingPattern;
+      return (
+        <>
+          {"[ "}
+          {t.elements.map((el, idx) => {
+            const last = idx === t.elements.length - 1;
+            return (
+              <span key={idx}>
+                <Tree tree={el} />
+                {!last && ", "}
+              </span>
+            );
+          })}
+          {" ]"}
+        </>
       );
     }
 
@@ -270,7 +292,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
       const t = tree as ts.ArrayLiteralExpression;
       return (
         <span>
-          [
+          {"[ "}
           {t.elements.map((e, idx) => {
             const isLastArg = idx === t.elements.length - 1;
             return (
@@ -280,7 +302,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
               </span>
             );
           })}
-          ]
+          {" ]"}
         </span>
       );
     }
@@ -546,7 +568,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
       const t = tree as ts.JsxElement;
       return (
         <span>
-          {"("}
           <IndentBlock>
             <Tree tree={t.openingElement} />
             <IndentBlock>
@@ -560,8 +581,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
             </IndentBlock>
             <Tree tree={t.closingElement} />
           </IndentBlock>
-
-          {")"}
         </span>
       );
     }
@@ -583,7 +602,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
       return (
         <span>
           <Tree tree={t.expression} />
-          .
+          {t.questionDotToken ? "?." : "."}
           <Tree tree={t.name} />
         </span>
       );
@@ -622,6 +641,24 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </div>
       );
     }
+    case ts.SyntaxKind.ImportSpecifier: {
+      const t = tree as ts.ImportSpecifier;
+      return (
+        <>
+          {t.propertyName ? (
+            <>
+              <Tree tree={t.propertyName} />
+              &nbsp;
+              <Keyword>as</Keyword>
+              &nbsp;
+              <Tree tree={t.name} />
+            </>
+          ) : (
+            <Tree tree={t.name} />
+          )}
+        </>
+      );
+    }
 
     case ts.SyntaxKind.ImportClause: {
       const t = tree as ts.ImportClause;
@@ -633,6 +670,39 @@ export function Tree({ tree }: { tree: ts.Node }) {
             </>
           )}
           {t.name && <Tree tree={t.name} />}
+          {t.namedBindings?.kind === ts.SyntaxKind.NamespaceImport && (
+            <>
+              <Keyword>{"*"}</Keyword>
+              {t.namedBindings.name && (
+                <>
+                  &nbsp;
+                  <Keyword>as</Keyword>
+                  &nbsp;
+                  <Tree tree={t.namedBindings.name} />
+                </>
+              )}
+            </>
+          )}
+          {t.namedBindings?.kind === ts.SyntaxKind.NamedImports && (
+            <>
+              {t.name && ", "}
+              {"{ "}
+              {(t.namedBindings as ts.NamedImports).elements.map(
+                (bind, idx) => {
+                  const last =
+                    idx ===
+                    (t.namedBindings as ts.NamedImports).elements.length - 1;
+                  return (
+                    <span key={idx}>
+                      <Tree tree={bind} />
+                      {!last && <>, </>}
+                    </span>
+                  );
+                }
+              )}
+              {" }"}
+            </>
+          )}
         </>
       );
     }
@@ -649,8 +719,18 @@ export function Tree({ tree }: { tree: ts.Node }) {
 
     case ts.SyntaxKind.HeritageClause: {
       const t = tree as ts.HeritageClause;
+      console.log(t);
+
       return (
         <>
+          &nbsp;
+          {t.token === ts.SyntaxKind.ExtendsKeyword && (
+            <Keyword>extends</Keyword>
+          )}
+          {t.token === ts.SyntaxKind.ImplementsKeyword && (
+            <Keyword>implements</Keyword>
+          )}
+          &nbsp;
           {t.types.map((tt, idx) => {
             const last = idx === t.types!.length - 1;
 
@@ -687,9 +767,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
           )}
           {t.heritageClauses && (
             <>
-              &nbsp;
-              <Keyword>extends</Keyword>
-              &nbsp;
               {t.heritageClauses.map((h, idx) => {
                 const last: boolean = idx === t.heritageClauses!.length - 1;
                 return (
@@ -785,7 +862,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
         if (ts.isIdentifier(decl.name)) {
           el = <>{decl.name.text}</>;
         } else {
-          el = <UnknownDump tree={decl.name} />;
+          el = <Tree tree={decl.name} />;
         }
 
         let initializer;
@@ -822,7 +899,9 @@ export function Tree({ tree }: { tree: ts.Node }) {
           {t.expression && (
             <>
               &nbsp;
+              {"("}
               <Tree tree={t.expression} />
+              {")"}
             </>
           )}
           ;
@@ -923,9 +1002,8 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
+
     case ts.SyntaxKind.ClassDeclaration: {
-      // TODO: extends
-      // TODO: implements
       const t = tree as ts.ClassDeclaration;
       return (
         <div>
@@ -939,7 +1017,19 @@ export function Tree({ tree }: { tree: ts.Node }) {
               )}
             </>
           )}
-          &nbsp;
+          {t.heritageClauses && (
+            <>
+              {t.heritageClauses.map((h, idx) => {
+                const last: boolean = idx === t.heritageClauses!.length - 1;
+                return (
+                  <span key={idx}>
+                    <Tree tree={h} />
+                  </span>
+                );
+              })}
+              &nbsp;
+            </>
+          )}
           {"{"}
           <IndentBlock>
             {t.members &&
