@@ -1,7 +1,8 @@
 import React, { Suspense, useCallback, useState } from "react";
 import ReactDOM from "react-dom";
 import ts from "typescript";
-import { Tree } from "./components/Tree";
+import { RootTree } from "./components/Tree";
+import type * as monaco from "monaco-editor";
 
 const MonacoEditor = React.lazy(() => import("./components/MonacoEditor"));
 
@@ -9,6 +10,11 @@ type State = {
   code: string;
   ast: ts.SourceFile;
 };
+
+const code_test = `
+const x = 1;
+const y = x;
+`;
 
 const code_binding = `
 const {a} = {a: 1};
@@ -779,14 +785,25 @@ const Literal = styled.span\`
 \`;
 `;
 
-const code = code2;
+const code = code_test;
 
 const initialState = {
   code: code,
   ast: parseTypeScript(code),
 };
+
 function App() {
   const [state, setState] = useState<State>(initialState);
+  const [checkpointCode, setCheckpointCode] = useState<string>(state.code);
+  const [
+    editor,
+    setEditor,
+  ] = useState<null | monaco.editor.IStandaloneCodeEditor>(null);
+
+  const onInit = useCallback((ed) => {
+    setEditor(ed);
+  }, []);
+
   const onChangeSource = useCallback((value: string) => {
     const ast = parseTypeScript(value);
     setState({
@@ -794,6 +811,34 @@ function App() {
       ast,
     });
   }, []);
+
+  const onChangeNode = useCallback(
+    (prev: ts.Node, next: ts.Node) => {
+      function rewriter(): ts.TransformerFactory<ts.Node> {
+        return (context) => {
+          const visit: ts.Visitor = (node) => {
+            if (node.kind === prev.kind && node.pos === prev.pos) {
+              return next;
+            }
+            return ts.visitEachChild(node, (child) => visit(child), context);
+          };
+          return (node) => ts.visitNode(node, visit);
+        };
+      }
+      const result = ts.transform(state.ast, [rewriter()]);
+      console.log(result);
+      const newAst = result.transformed[0] as ts.SourceFile;
+      const newCode = newAst.getFullText();
+      debugger;
+      setState({
+        code: newCode,
+        ast: newAst,
+      });
+      setCheckpointCode(newCode);
+    },
+    [state.code]
+  );
+
   return (
     <div
       style={{
@@ -805,7 +850,11 @@ function App() {
     >
       <div style={{ flex: 1, height: "100%" }}>
         <Suspense fallback="loading...">
-          <MonacoEditor initialCode={code} onChange={onChangeSource} />
+          <MonacoEditor
+            initialCode={checkpointCode}
+            onChange={onChangeSource}
+            onInit={onInit}
+          />
         </Suspense>
       </div>
       <div
@@ -838,7 +887,7 @@ function App() {
               whiteSpace: "nowrap",
             }}
           >
-            <Tree tree={state.ast} />
+            <RootTree tree={state.ast} onChangeNode={onChangeNode} />
           </div>
         </div>
       </div>

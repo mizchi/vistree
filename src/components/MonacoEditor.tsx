@@ -1,6 +1,6 @@
 import * as monaco from "monaco-editor";
 import { format } from "../worker/prettier.worker";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 monaco.languages.typescript.typescriptDefaults.getEagerModelSync();
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -28,19 +28,26 @@ monaco.languages.typescript.typescriptDefaults.addExtraLib(
   "file:///decls.d.ts"
 );
 
-async function getTypeScriptService() {
-  const getWorker = await monaco.languages.typescript.getTypeScriptWorker();
-  const worker = await getWorker(monaco.Uri.parse("file:///index.tsx"));
-  return worker;
-}
+// async function getTypeScriptService() {
+//   const getWorker = await monaco.languages.typescript.getTypeScriptWorker();
+//   const worker = await getWorker(monaco.Uri.parse("file:///index.tsx"));
+//   return worker;
+// }
 
 // ----------------------
 
-export default function MonacoEditor(props: {
+export default React.memo(function MonacoEditor(props: {
   initialCode: string;
   onChange: (value: string) => void;
+  onInit: (editor: monaco.editor.IStandaloneCodeEditor) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [
+    editor,
+    setEditor,
+  ] = useState<null | monaco.editor.IStandaloneCodeEditor>(null);
+  // useEffect(() => {
+  // }, [props.initialCode]);
   useEffect(() => {
     if (ref.current) {
       const model = monaco.editor.createModel(
@@ -74,7 +81,14 @@ export default function MonacoEditor(props: {
         props.onChange(editor.getValue());
       });
       editor.layout();
+      setEditor(editor);
+      props.onInit(editor);
     }
   }, [ref]);
+  useEffect(() => {
+    if (editor) {
+      editor.setValue(props.initialCode);
+    }
+  }, [props.initialCode, editor]);
   return <div ref={ref} style={{ height: "100%", width: "100%" }}></div>;
-}
+});

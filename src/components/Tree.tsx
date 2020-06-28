@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useContext, useRef } from "react";
 import ts from "typescript";
 import styled from "styled-components";
 
+const SourceContext = React.createContext<ts.SourceFile>(null as any);
+const HandlerContext = React.createContext<
+  (old: ts.Node, next: ts.Node) => void
+>(null as any);
+
+export function RootTree(props: {
+  tree: ts.SourceFile;
+  onChangeNode: (old: ts.Node, next: ts.Node) => void;
+}) {
+  return (
+    <SourceContext.Provider value={props.tree}>
+      <HandlerContext.Provider value={props.onChangeNode}>
+        <Tree tree={props.tree} />
+      </HandlerContext.Provider>
+    </SourceContext.Provider>
+  );
+}
+
 export function Tree({ tree }: { tree: ts.Node }) {
+  // const source = useContext(SourceContext);
+  const onChangeNode = useContext(HandlerContext);
   switch (tree.kind) {
     // Root
     case ts.SyntaxKind.Block:
@@ -30,7 +50,27 @@ export function Tree({ tree }: { tree: ts.Node }) {
     // Expression
     case ts.SyntaxKind.Identifier: {
       const t = tree as ts.Identifier;
-      return <span>{t.text}</span>;
+      const ref = useRef<HTMLSpanElement>(null);
+      return (
+        <input
+          defaultValue={t.text}
+          style={{
+            background: "#222",
+            color: "#eee",
+            border: "none",
+            outline: "1px solid #ccc",
+            fontFamily:
+              "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace",
+            width: `${t.text.length * 8 + 6}px`,
+          }}
+          onChange={(ev) => {
+            const value = ev.target.value;
+            ev.target.style.width = `${value.length * 8 + 6}px`;
+            onChangeNode(t, ts.createIdentifier(value));
+            // onChange(ev.target.value, t.pos, t.end);
+          }}
+        ></input>
+      );
     }
     case ts.SyntaxKind.PropertyDeclaration: {
       const t = tree as ts.PropertyDeclaration;
