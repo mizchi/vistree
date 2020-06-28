@@ -7,9 +7,13 @@
 - [x] Export
 - [x] Export Default
 - [x] Import
-- [ ] Class
+- [x] Class
 - [x] Object Literal
+- [x] Arrow Function
+- [ ] Interface
 - [ ] `const {} = {}`
 - [ ] `foo!`
 - [ ] decolator
-- [x] Arrow Function
+- [ ] Generics
+- [ ] implements
+- [ ] TypeParameters

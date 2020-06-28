@@ -1,5 +1,5 @@
 import React from "react";
-import ts, { TypeReference, IndentStyle } from "typescript";
+import ts from "typescript";
 import styled from "styled-components";
 
 export function Tree({ tree }: { tree: ts.Node }) {
@@ -205,6 +205,10 @@ export function Tree({ tree }: { tree: ts.Node }) {
       return <Keyword>null</Keyword>;
     }
 
+    case ts.SyntaxKind.VoidKeyword: {
+      return <Keyword>void</Keyword>;
+    }
+
     case ts.SyntaxKind.AnyKeyword: {
       return <Keyword>any</Keyword>;
     }
@@ -215,6 +219,10 @@ export function Tree({ tree }: { tree: ts.Node }) {
     case ts.SyntaxKind.ImportKeyword: {
       return <Keyword>import</Keyword>;
     }
+    case ts.SyntaxKind.ReadonlyKeyword: {
+      return <Keyword>readonly</Keyword>;
+    }
+
     case ts.SyntaxKind.EqualsToken: {
       return <span>=</span>;
     }
@@ -629,16 +637,80 @@ export function Tree({ tree }: { tree: ts.Node }) {
       );
     }
 
+    case ts.SyntaxKind.ExpressionWithTypeArguments: {
+      const t = tree as ts.ExpressionWithTypeArguments;
+      return (
+        <>
+          <Tree tree={t.expression} />
+          {t.typeArguments && <TypeArguments typeArguments={t.typeArguments} />}
+        </>
+      );
+    }
+
+    case ts.SyntaxKind.HeritageClause: {
+      const t = tree as ts.HeritageClause;
+      return (
+        <>
+          {t.types.map((tt, idx) => {
+            const last = idx === t.types!.length - 1;
+
+            return (
+              <span key={idx}>
+                <Tree tree={tt} />
+                {!last && <>, </>}
+              </span>
+            );
+          })}
+        </>
+      );
+    }
+
+    case ts.SyntaxKind.TypeParameter: {
+      const t = (tree as unknown) as any;
+      return (
+        <>
+          <Tree tree={t.name} />
+        </>
+      );
+    }
     case ts.SyntaxKind.InterfaceDeclaration: {
       // TODO: extends
       const t = tree as ts.InterfaceDeclaration;
       return (
         <div>
+          {t.modifiers && <Modifiers modifiers={t.modifiers} />}
           <Keyword>interface</Keyword>
           &nbsp;
           <Tree tree={t.name} />
+          {t.typeParameters && (
+            <TypeParameters typeParameters={t.typeParameters} />
+          )}
+          {t.heritageClauses && (
+            <>
+              &nbsp;
+              <Keyword>extends</Keyword>
+              &nbsp;
+              {t.heritageClauses.map((h, idx) => {
+                const last: boolean = idx === t.heritageClauses!.length - 1;
+                return (
+                  <span key={idx}>
+                    <Tree tree={h} />
+                    {!last && <>, </>}
+                  </span>
+                );
+              })}
+            </>
+          )}
           {" {"}
-          WIP
+          <IndentBlock>
+            {t.members.map((m, idx) => {
+              return (
+                <div key={idx}>
+                  <Tree tree={m} />;
+                </div>
+              );
+            })}
+          </IndentBlock>
           {"}"}
         </div>
       );
@@ -806,6 +878,26 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
+
+    case ts.SyntaxKind.FunctionType: {
+      const t = tree as ts.FunctionTypeNode;
+      return (
+        <>
+          {t.modifiers && <Modifiers modifiers={t.modifiers} />}(
+          {t.parameters.map((p, idx) => {
+            const last = idx === t.parameters.length - 1;
+            return (
+              <span key={idx}>
+                <Tree tree={p} />
+                {!last && ", "}
+              </span>
+            );
+          })}
+          ){" => "}
+          <Tree tree={t.type} />
+        </>
+      );
+    }
     case ts.SyntaxKind.TypeAliasDeclaration: {
       const t = tree as ts.TypeAliasDeclaration;
       return (
@@ -842,6 +934,9 @@ export function Tree({ tree }: { tree: ts.Node }) {
             <>
               &nbsp;
               <Tree tree={t.name} />
+              {t.typeParameters && (
+                <TypeParameters typeParameters={t.typeParameters} />
+              )}
             </>
           )}
           &nbsp;
@@ -1036,6 +1131,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
       const t = (tree as unknown) as ts.PropertySignature;
       return (
         <>
+          {t.modifiers && <Modifiers modifiers={t.modifiers} />}
           <Tree tree={t.name} />
           {t.type && (
             <>
@@ -1052,6 +1148,24 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
+    case ts.SyntaxKind.MethodSignature: {
+      const t = tree as ts.MethodSignature;
+      return (
+        <>
+          {t.modifiers && <Modifiers modifiers={t.modifiers} />}
+          <Tree tree={t.name} />
+          (
+          <Parameters parameters={t.parameters} />)
+          {t.type && (
+            <>
+              :&nbsp;
+              <Tree tree={t.type} />
+            </>
+          )}
+        </>
+      );
+    }
+
     case ts.SyntaxKind.ArrayType: {
       const t = tree as ts.ArrayTypeNode;
       return (
@@ -1081,10 +1195,13 @@ export function Tree({ tree }: { tree: ts.Node }) {
     }
 
     case ts.SyntaxKind.TypeReference: {
-      // @ts-ignore
-      const t = tree as ts.TypeReference;
-      // @ts-ignore
-      return <Tree tree={t.typeName} />;
+      const t = tree as ts.TypeReferenceNode;
+      return (
+        <>
+          <Tree tree={t.typeName} />
+          {t.typeArguments && <TypeArguments typeArguments={t.typeArguments} />}
+        </>
+      );
     }
 
     default: {
@@ -1123,6 +1240,44 @@ function UnknownDump(props: { tree: ts.Node }) {
         {ts.SyntaxKind[props.tree.kind]}: {JSON.stringify(props.tree, null, 2)}
       </code>
     </pre>
+  );
+}
+
+function TypeArguments(props: { typeArguments: ts.NodeArray<ts.TypeNode> }) {
+  return (
+    <>
+      {"<"}
+      {props.typeArguments.map((tt, idx) => {
+        const last = idx === props.typeArguments!.length - 1;
+        return (
+          <span key={idx}>
+            <Tree tree={tt} />
+            {!last && <>, </>}
+          </span>
+        );
+      })}
+      {">"}
+    </>
+  );
+}
+
+function TypeParameters(props: {
+  typeParameters: ts.NodeArray<ts.TypeParameterDeclaration>;
+}) {
+  return (
+    <>
+      {"<"}
+      {props.typeParameters.map((tt, idx) => {
+        const last = idx === props.typeParameters!.length - 1;
+        return (
+          <span key={idx}>
+            <Tree tree={tt} />
+            {!last && <>, </>}
+          </span>
+        );
+      })}
+      {">"}
+    </>
   );
 }
 

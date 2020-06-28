@@ -1,17 +1,11 @@
 import * as monaco from "monaco-editor";
 import { format } from "../worker/prettier.worker";
 import React, { useEffect, useRef } from "react";
-// import { showAst } from "../worker/typescript";
-// import * as ts from "typescript";
 
 monaco.languages.typescript.typescriptDefaults.getEagerModelSync();
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   jsx: monaco.languages.typescript.JsxEmit.React,
-  // jsxFactory: "React.createElement",
-  // reactNamespace: "React",
   allowNonTsExtensions: true,
-  // allowJs: true,
-  // typeRoots: ["./types"],
   moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
   allowSyntheticDefaultImports: true,
   target: monaco.languages.typescript.ScriptTarget.Latest,
@@ -73,24 +67,8 @@ export default function MonacoEditor(props: {
         monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
         async () => {
           editor.getAction("editor.action.formatDocument").run();
-          // const service = await getTypeScriptService();
-          // const p = service
-          // await showAst(editor.getValue());
-          // const diag = await service.getSemanticDiagnostics(
-          //   "file:///index.tsx"
-          // );
-          // // const out = await service.getEmitOutput("file:///index.tsx");
-          // console.log(diag);
         }
       );
-
-      // editor.addCommand(
-      //   monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_R,
-      //   async () => {
-      //     console.log("ctrl-R", out);
-      //     // editor.getAction("editor.action.formatDocument").run();
-      //   }
-      // );
 
       editor.onDidChangeModelContent(() => {
         props.onChange(editor.getValue());

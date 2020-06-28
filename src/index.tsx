@@ -10,6 +10,13 @@ type State = {
   ast: ts.SourceFile;
 };
 
+const code3 = `export interface Sock<T> extends T, U<A> {
+  color: string;
+  foo: () => void;
+  bar(a: number): void;
+}
+`;
+
 const code1 = `
 // A class is a special type of JavaScript object which
 // is always created via a constructor. These classes
@@ -758,7 +765,7 @@ const Literal = styled.span\`
 \`;
 `;
 
-const code = code1;
+const code = code3;
 
 const initialState = {
   code: code,
