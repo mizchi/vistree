@@ -12,8 +12,12 @@ type State = {
 };
 
 const code_test = `
-const x = 1;
-const y = x;
+switch (true) {
+  case true:
+  case false: {
+    1;
+  }
+}
 `;
 
 const code_binding = `
@@ -817,7 +821,9 @@ function App() {
       function rewriter(): ts.TransformerFactory<ts.Node> {
         return (context) => {
           const visit: ts.Visitor = (node) => {
-            if (node.kind === prev.kind && node.pos === prev.pos) {
+            const isSameNode = node.kind === prev.kind && node.pos === prev.pos;
+            console.log("isSameNode", isSameNode, prev.kind, prev.pos);
+            if (isSameNode) {
               return next;
             }
             return ts.visitEachChild(node, (child) => visit(child), context);
@@ -826,17 +832,19 @@ function App() {
         };
       }
       const result = ts.transform(state.ast, [rewriter()]);
-      console.log(result);
       const newAst = result.transformed[0] as ts.SourceFile;
-      const newCode = newAst.getFullText();
-      debugger;
+      const printer = ts.createPrinter();
+      const newCode = printer.printFile(result.transformed[0] as ts.SourceFile);
+
       setState({
         code: newCode,
         ast: newAst,
       });
+      console.log("change to ", newCode);
+
       setCheckpointCode(newCode);
     },
-    [state.code]
+    [state.code, state.ast]
   );
 
   return (
@@ -848,7 +856,7 @@ function App() {
         height: "100%",
       }}
     >
-      <div style={{ flex: 1, height: "100%" }}>
+      <div style={{ flex: 1, height: "100%", maxWidth: "50%" }}>
         <Suspense fallback="loading...">
           <MonacoEditor
             initialCode={checkpointCode}

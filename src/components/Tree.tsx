@@ -66,6 +66,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
           onChange={(ev) => {
             const value = ev.target.value;
             ev.target.style.width = `${value.length * 8 + 6}px`;
+            // console.log("change to", value);
             onChangeNode(t, ts.createIdentifier(value));
             // onChange(ev.target.value, t.pos, t.end);
           }}
@@ -1161,29 +1162,51 @@ export function Tree({ tree }: { tree: ts.Node }) {
           {t.caseBlock.clauses.map((clause, idx) => {
             if (clause.kind === ts.SyntaxKind.DefaultClause) {
               const c = clause as ts.DefaultClause;
+              // console.log(c);
               return (
                 <div key={idx}>
-                  <Keyword>default</Keyword>:{"{"}
-                  <IndentBlock>
-                    {c.statements.map((stmt, idx) => {
-                      return <Tree tree={stmt} key={idx} />;
-                    })}
-                  </IndentBlock>
-                  {"}"}
+                  <Keyword>default</Keyword>:
+                  <>
+                    {"{"}
+                    <IndentBlock>
+                      {c.statements.map((stmt, idx) => {
+                        return <Tree tree={stmt} key={idx} />;
+                      })}
+                    </IndentBlock>
+                    {"}"}
+                  </>
                 </div>
               );
             } else {
               const c = clause as ts.CaseClause;
+              const isBlock = c.statements[0]?.kind === ts.SyntaxKind.Block;
               return (
                 <IndentBlock key={idx}>
                   <Keyword>case</Keyword>
                   &nbsp;
                   <Tree tree={c.expression} />
-                  :&nbsp;{"{"}
-                  {c.statements.map((stmt, idx) => {
-                    return <Tree tree={stmt} key={idx} />;
-                  })}
-                  {"}"}
+                  {":"}
+                  {c.statements.length > 0 && (
+                    <>
+                      {isBlock ? (
+                        <>
+                          &nbsp;{"{"}
+                          {c.statements.map((stmt, idx) => {
+                            return <Tree tree={stmt} key={idx} />;
+                          })}
+                          {"}"}
+                        </>
+                      ) : (
+                        <>
+                          <IndentBlock>
+                            {c.statements.map((stmt, idx) => {
+                              return <Tree tree={stmt} key={idx} />;
+                            })}
+                          </IndentBlock>
+                        </>
+                      )}
+                    </>
+                  )}
                 </IndentBlock>
               );
             }

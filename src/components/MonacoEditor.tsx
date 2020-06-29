@@ -1,6 +1,7 @@
 import * as monaco from "monaco-editor";
 import { format } from "../worker/prettier.worker";
 import React, { useEffect, useRef, useState } from "react";
+declare var ResizeObserver: any;
 
 monaco.languages.typescript.typescriptDefaults.getEagerModelSync();
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -80,9 +81,16 @@ export default React.memo(function MonacoEditor(props: {
       editor.onDidChangeModelContent(() => {
         props.onChange(editor.getValue());
       });
-      editor.layout();
       setEditor(editor);
       props.onInit(editor);
+
+      // layouting
+      editor.layout();
+      const resizeObserver = new ResizeObserver((entries: any) => {
+        editor.layout();
+      });
+      resizeObserver.observe(ref.current);
+      return () => {};
     }
   }, [ref]);
   useEffect(() => {
