@@ -21,7 +21,6 @@ export function RootTree(props: {
 }
 
 export function Tree({ tree }: { tree: ts.Node }) {
-  // const source = useContext(SourceContext);
   const onChangeNode = useContext(HandlerContext);
   switch (tree.kind) {
     // Root
@@ -901,7 +900,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
       const children = t.declarations.map((decl, idx) => {
         let el: React.ReactNode;
         if (ts.isIdentifier(decl.name)) {
-          el = <>{decl.name.text}</>;
+          el = <Tree tree={decl.name} />;
         } else {
           el = <Tree tree={decl.name} />;
         }
@@ -1382,10 +1381,6 @@ function Modifiers(props: { modifiers: ts.ModifiersArray }) {
   );
 }
 
-function IndentBlock(props: { children: any }) {
-  return <div style={{ paddingLeft: "1rem" }}>{props.children}</div>;
-}
-
 function UnknownDump(props: { tree: ts.Node }) {
   return (
     <pre>
@@ -1475,3 +1470,7 @@ const Keyword = styled.span`
 const Literal = styled.span`
   color: rgb(181, 206, 168);
 `;
+
+function IndentBlock(props: { children: any }) {
+  return <div style={{ paddingLeft: "1rem" }}>{props.children}</div>;
+}

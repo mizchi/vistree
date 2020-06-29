@@ -29,12 +29,6 @@ monaco.languages.typescript.typescriptDefaults.addExtraLib(
   "file:///decls.d.ts"
 );
 
-// async function getTypeScriptService() {
-//   const getWorker = await monaco.languages.typescript.getTypeScriptWorker();
-//   const worker = await getWorker(monaco.Uri.parse("file:///index.tsx"));
-//   return worker;
-// }
-
 // ----------------------
 
 export default React.memo(function MonacoEditor(props: {
@@ -47,8 +41,6 @@ export default React.memo(function MonacoEditor(props: {
     editor,
     setEditor,
   ] = useState<null | monaco.editor.IStandaloneCodeEditor>(null);
-  // useEffect(() => {
-  // }, [props.initialCode]);
   useEffect(() => {
     if (ref.current) {
       const model = monaco.editor.createModel(
