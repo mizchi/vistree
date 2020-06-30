@@ -3,13 +3,10 @@ import ReactDOM from "react-dom";
 import ts from "typescript";
 import { RootTree } from "./components/Tree";
 import type * as monaco from "monaco-editor";
+import { astToCode } from "./worker/typescript.worker";
+import { format } from "./worker/prettier.worker";
 
 const MonacoEditor = React.lazy(() => import("./components/MonacoEditor"));
-
-type State = {
-  code: string;
-  ast: ts.SourceFile;
-};
 
 const code_test = `
 switch (true) {
@@ -1509,16 +1506,12 @@ function IndentBlock(props: { children: any }) {
 }
 `;
 
-const code = code3;
-
-const initialState = {
-  code: code,
-  ast: parseTypeScript(code),
-};
+const initialCode = code3;
 
 function App() {
-  const [state, setState] = useState<State>(initialState);
-  const [checkpointCode, setCheckpointCode] = useState<string>(state.code);
+  const [code, setCode] = useState<string>(initialCode);
+  const [ast, setAst] = useState<ts.SourceFile>(parseTypeScript(code));
+  const [checkpointCode, setCheckpointCode] = useState<string>(code);
   const [
     editor,
     setEditor,
@@ -1528,16 +1521,13 @@ function App() {
     setEditor(ed);
   }, []);
 
-  const onChangeSource = useCallback((value: string) => {
+  const onChangeCode = useCallback((value: string) => {
     const ast = parseTypeScript(value);
-    setState({
-      code: value,
-      ast,
-    });
+    setAst(ast);
   }, []);
 
   const onChangeNode = useCallback(
-    (prev: ts.Node, next: ts.Node) => {
+    async (prev: ts.Node, next: ts.Node) => {
       function rewriter(): ts.TransformerFactory<ts.Node> {
         return (context) => {
           const visit: ts.Visitor = (node) => {
@@ -1550,20 +1540,19 @@ function App() {
           return (node) => ts.visitNode(node, visit);
         };
       }
-      const result = ts.transform(state.ast, [rewriter()]);
+      const result = ts.transform(ast, [rewriter()]);
       const newAst = result.transformed[0] as ts.SourceFile;
-      const printer = ts.createPrinter();
-      const newCode = printer.printFile(result.transformed[0] as ts.SourceFile);
-
-      setState({
-        code: newCode,
-        ast: newAst,
-      });
-      console.log("change to ", newCode);
-
-      setCheckpointCode(newCode);
+      setAst(newAst);
+      console.time("print");
+      const newCode = await astToCode(result.transformed[0] as ts.SourceFile);
+      console.timeEnd("print");
+      console.time("format");
+      const newCodeFormatted = await format(newCode);
+      console.timeEnd("format");
+      setCode(newCodeFormatted);
+      setCheckpointCode(newCodeFormatted);
     },
-    [state.code, state.ast]
+    [code, ast]
   );
 
   return (
@@ -1579,7 +1568,7 @@ function App() {
         <Suspense fallback="loading...">
           <MonacoEditor
             initialCode={checkpointCode}
-            onChange={onChangeSource}
+            onChange={onChangeCode}
             onInit={onInit}
           />
         </Suspense>
@@ -1614,7 +1603,7 @@ function App() {
               whiteSpace: "nowrap",
             }}
           >
-            <RootTree tree={state.ast} onChangeNode={onChangeNode} />
+            <RootTree tree={ast} onChangeNode={onChangeNode} />
           </div>
         </div>
       </div>
@@ -1624,11 +1613,14 @@ function App() {
 ReactDOM.render(<App />, document.querySelector("#root"));
 
 function parseTypeScript(value: string) {
-  return ts.createSourceFile(
+  console.time("parse");
+  const ret = ts.createSourceFile(
     "file:///index.ts",
     value,
     ts.ScriptTarget.Latest,
     /*setParentNodes*/ false,
     ts.ScriptKind.TSX
   );
+  console.timeEnd("parse");
+  return ret;
 }

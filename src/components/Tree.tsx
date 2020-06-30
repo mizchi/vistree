@@ -52,7 +52,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
       const ref = useRef<HTMLSpanElement>(null);
       return (
         <input
-          defaultValue={t.text}
+          value={t.text}
           style={{
             background: "#222",
             color: "#eee",
@@ -69,7 +69,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
             onChangeNode(t, ts.createIdentifier(value));
             // onChange(ev.target.value, t.pos, t.end);
           }}
-        ></input>
+        />
       );
     }
     case ts.SyntaxKind.PropertyDeclaration: {

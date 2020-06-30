@@ -49,50 +49,7 @@ export function makeFactorialFunction() {
   );
 }
 
-export function run() {
-  const resultFile = ts.createSourceFile(
-    "someFileName.ts",
-    "",
-    ts.ScriptTarget.Latest,
-    /*setParentNodes*/ false,
-    ts.ScriptKind.TS
-  );
-  const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-
-  const result = printer.printNode(
-    ts.EmitHint.Unspecified,
-    makeFactorialFunction(),
-    resultFile
-  );
-  console.log(result);
-}
-
-export function showAst(code: string) {
-  const file = ts.createSourceFile(
-    "file:///index.ts",
-    code,
-    ts.ScriptTarget.Latest,
-    /*setParentNodes*/ false,
-    ts.ScriptKind.TS
-  );
-
-  // console.log(file);
-  walk(file);
-
-  function walk(node: ts.Node) {
-    console.log(node, node.kind);
-    ts.forEachChild(node, walk);
-  }
-  // debugger;
-
-  // file.forEachChild()
-
-  // const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-  // printer.printNode(ts.EmitHint.Unspecified, )
-  // const result = printer.printNode(
-  //   ts.EmitHint.Unspecified,
-  //   makeFactorialFunction(),
-  //   resultFile
-  // );
-  // console.log(result);
+export async function astToCode(source: ts.SourceFile) {
+  const printer = ts.createPrinter();
+  return printer.printFile(source);
 }
