@@ -20,7 +20,7 @@ export function RootTree(props: {
   );
 }
 
-export function Tree({ tree }: { tree: ts.Node }) {
+function Tree({ tree }: { tree: ts.Node }) {
   const onChangeNode = useContext(HandlerContext);
   switch (tree.kind) {
     // Root
@@ -259,22 +259,21 @@ export function Tree({ tree }: { tree: ts.Node }) {
     case ts.SyntaxKind.SuperKeyword: {
       return <Keyword>super</Keyword>;
     }
-
+    case ts.SyntaxKind.UnknownKeyword: {
+      return <Keyword>unknown</Keyword>;
+    }
     case ts.SyntaxKind.BooleanKeyword: {
       return <Keyword>boolean</Keyword>;
     }
     case ts.SyntaxKind.NullKeyword: {
       return <Keyword>null</Keyword>;
     }
-
     case ts.SyntaxKind.VoidKeyword: {
       return <Keyword>void</Keyword>;
     }
-
     case ts.SyntaxKind.AnyKeyword: {
       return <Keyword>any</Keyword>;
     }
-
     case ts.SyntaxKind.ExportKeyword: {
       return <Keyword>export</Keyword>;
     }
@@ -284,7 +283,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
     case ts.SyntaxKind.ReadonlyKeyword: {
       return <Keyword>readonly</Keyword>;
     }
-
     case ts.SyntaxKind.EqualsToken: {
       return <span>=</span>;
     }
@@ -300,7 +298,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
     case ts.SyntaxKind.ExclamationEqualsToken: {
       return <span>{"!="}</span>;
     }
-
     case ts.SyntaxKind.AmpersandAmpersandToken: {
       return <span>{"&&"}</span>;
     }
@@ -366,7 +363,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.NoSubstitutionTemplateLiteral: {
       const t = tree as ts.NoSubstitutionTemplateLiteral;
       return (
@@ -397,7 +393,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.TaggedTemplateExpression: {
       const t = tree as ts.TaggedTemplateExpression;
       return (
@@ -418,7 +413,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.ElementAccessExpression: {
       const t = tree as ts.ElementAccessExpression;
       return (
@@ -429,7 +423,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.NonNullExpression: {
       const t = tree as ts.NonNullExpression;
       return (
@@ -438,7 +431,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.PrefixUnaryExpression: {
       const t = tree as ts.PostfixUnaryExpression;
       let token = {};
@@ -457,7 +449,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.PostfixUnaryExpression: {
       const t = tree as ts.PostfixUnaryExpression;
       let token;
@@ -473,7 +464,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.AsExpression: {
       const t = tree as ts.AsExpression;
       return (
@@ -486,13 +476,11 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     // JSX
     case ts.SyntaxKind.JsxText: {
       const t = tree as ts.JsxText;
       return <>{t.text}</>;
     }
-
     case ts.SyntaxKind.JsxFragment: {
       const t = tree as ts.JsxFragment;
       return (
@@ -511,7 +499,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.JsxExpression: {
       const t = tree as ts.JsxExpression;
       return (
@@ -522,7 +509,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.JsxSelfClosingElement: {
       const t = tree as ts.JsxSelfClosingElement;
       return (
@@ -557,7 +543,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.JsxOpeningElement: {
       const t = tree as ts.JsxOpeningElement;
       return (
@@ -603,7 +588,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.JsxElement: {
       const t = tree as ts.JsxElement;
       return (
@@ -624,7 +608,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.BinaryExpression: {
       const t = tree as ts.BinaryExpression;
       return (
@@ -653,26 +636,27 @@ export function Tree({ tree }: { tree: ts.Node }) {
         <span>
           <Tree tree={t.expression} />(
           <Arguments arguments={t.arguments} />)
+          {t.typeArguments && (
+            <>
+              <TypeArguments typeArguments={t.typeArguments} />
+            </>
+          )}
         </span>
       );
     }
-
     case ts.SyntaxKind.StringLiteral: {
       const t = tree as ts.StringLiteral;
       return <Literal>"{t.text}"</Literal>;
     }
-
     case ts.SyntaxKind.NumericLiteral:
     case ts.SyntaxKind.FirstLiteralToken: {
       const t = tree as ts.NumericLiteral;
       return <Literal>{t.text}</Literal>;
     }
-
     case ts.SyntaxKind.EmptyStatement: {
       const t = tree as ts.EmptyStatement;
       return <div>{"// (empty)"}</div>;
     }
-
     case ts.SyntaxKind.ExpressionStatement: {
       const t = tree as ts.ExpressionStatement;
       return (
@@ -699,7 +683,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.ImportClause: {
       const t = tree as ts.ImportClause;
       return (
@@ -746,7 +729,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.ExpressionWithTypeArguments: {
       const t = tree as ts.ExpressionWithTypeArguments;
       return (
@@ -756,11 +738,8 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.HeritageClause: {
       const t = tree as ts.HeritageClause;
-      console.log(t);
-
       return (
         <>
           &nbsp;
@@ -773,7 +752,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
           &nbsp;
           {t.types.map((tt, idx) => {
             const last = idx === t.types!.length - 1;
-
             return (
               <span key={idx}>
                 <Tree tree={tt} />
@@ -784,7 +762,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.TypeParameter: {
       const t = (tree as unknown) as any;
       return (
@@ -832,7 +809,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </div>
       );
     }
-
     case ts.SyntaxKind.ExportAssignment: {
       const t = tree as ts.ExportAssignment;
       return (
@@ -845,7 +821,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </div>
       );
     }
-
     case ts.SyntaxKind.ImportDeclaration: {
       const t = tree as ts.ImportDeclaration;
       return (
@@ -888,10 +863,8 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </div>
       );
     }
-
     case ts.SyntaxKind.VariableDeclarationList: {
       const t = tree as ts.VariableDeclarationList;
-
       let declType;
       if (t.flags === ts.NodeFlags.Const) declType = "const";
       else if (t.flags === ts.NodeFlags.Let) declType = "let";
@@ -922,7 +895,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
           </span>
         );
       });
-
       return (
         <span>
           <Keyword>{declType}</Keyword>
@@ -997,7 +969,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </span>
       );
     }
-
     case ts.SyntaxKind.FunctionType: {
       const t = tree as ts.FunctionTypeNode;
       return (
@@ -1030,7 +1001,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </div>
       );
     }
-
     case ts.SyntaxKind.Constructor: {
       const t = tree as ts.ConstructorDeclaration;
       return (
@@ -1042,7 +1012,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.ClassDeclaration: {
       const t = tree as ts.ClassDeclaration;
       return (
@@ -1086,7 +1055,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
       );
       // return <span>{t.text}</span>;
     }
-
     case ts.SyntaxKind.FunctionDeclaration: {
       const t = tree as ts.FunctionDeclaration;
       return (
@@ -1151,7 +1119,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </div>
       );
     }
-
     case ts.SyntaxKind.SwitchStatement: {
       const t = tree as ts.SwitchStatement;
       return (
@@ -1214,14 +1181,12 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </div>
       );
     }
-
     // types
     case ts.SyntaxKind.LiteralType: {
       // const t = tree as ts.LiteralType;
       // @ts-ignore
       return <Tree tree={tree.literal} />;
     }
-
     case ts.SyntaxKind.IntersectionType: {
       // @ts-ignore
       const t = tree as ts.IntersectionType;
@@ -1240,7 +1205,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.UnionType: {
       // @ts-ignore
       const t = tree as ts.UnionType;
@@ -1329,8 +1293,7 @@ export function Tree({ tree }: { tree: ts.Node }) {
     }
 
     case ts.SyntaxKind.TypeLiteral: {
-      const t = (tree as unknown) as ts.TypeLiteralNode;
-      // @ts-ignore
+      const t = tree as ts.TypeLiteralNode;
       return (
         <>
           {"{"}
@@ -1345,7 +1308,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     case ts.SyntaxKind.TypeReference: {
       const t = tree as ts.TypeReferenceNode;
       return (
@@ -1355,7 +1317,6 @@ export function Tree({ tree }: { tree: ts.Node }) {
         </>
       );
     }
-
     default: {
       return (
         <span style={{ color: "red" }}>
