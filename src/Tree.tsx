@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext } from "react";
 import ts from "typescript";
 import styled from "styled-components";
 
@@ -56,27 +56,6 @@ function CodeTree({ tree }: { tree: ts.Node }) {
     case ts.SyntaxKind.Identifier: {
       const t = tree as ts.Identifier;
       return <>{t.text}</>;
-
-      // const ref = useRef<HTMLSpanElement>(null);
-      // return (
-      //   <input
-      //     value={t.text}
-      //     style={{
-      //       background: "#222",
-      //       color: "#eee",
-      //       border: "none",
-      //       outline: "1px solid #ccc",
-      //       fontFamily:
-      //         "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace",
-      //       width: `${t.text.length * 8 + 6}px`,
-      //     }}
-      //     onChange={(ev) => {
-      //       const value = ev.target.value;
-      //       ev.target.style.width = `${value.length * 8 + 6}px`;
-      //       onChangeNode(t, ts.createIdentifier(value));
-      //     }}
-      //   />
-      // );
     }
     case ts.SyntaxKind.PropertyDeclaration: {
       const t = tree as ts.PropertyDeclaration;

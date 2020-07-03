@@ -1,14 +1,16 @@
 import React, { Suspense, useCallback, useState } from "react";
 import ts from "typescript";
-import { RootTree } from "./Tree";
 import type * as monaco from "monaco-editor";
 import { astToCode } from "../worker/typescript.worker";
+import { Layout } from "./Layout";
 import { format } from "../worker/prettier.worker";
-import code from "!!raw-loader!./Tree.tsx";
-import { parseTypeScript, rewriteAst } from "../helper/tsHelper";
-import { Layout } from "../components/Layout";
 
-const MonacoEditor = React.lazy(() => import("../components/MonacoEditor"));
+// lib
+import { RootTree } from "../../../src/Tree";
+import { parseTypeScript, rewriteAst } from "../../../src/helper/tsHelper";
+import code from "!!raw-loader!../../../src/Tree.tsx";
+
+const MonacoEditor = React.lazy(() => import("./MonacoEditor"));
 const initialCode = code;
 
 export function App() {

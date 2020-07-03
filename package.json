@@ -4,8 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "webpack-dev-server --port 8100",
-    "build": "webpack --mode production"
+    "dev": "webpack-dev-server --config demo/webpack.config.js --port 8100",
+    "demo:build": "webpack --config demo/webpack.config.js --mode production",
+    "demo:deploy": "netlify deploy -d demo/dist --prod"
   },
   "dependencies": {
     "monaco-editor": "^0.20.0",
@@ -33,5 +34,8 @@
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
     "worker-plugin": "^4.0.3"
+  },
+  "peerDependencies": {
+    "typescript": "*"
   }
 }

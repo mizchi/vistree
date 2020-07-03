@@ -1,7 +1,7 @@
 import * as monaco from "monaco-editor";
 import { format } from "../worker/prettier.worker";
 import React, { useEffect, useRef, useState } from "react";
-import { loadDtsFiles } from "../helper/monacoHelper";
+import { loadDtsFiles } from "../monacoHelper";
 
 declare var ResizeObserver: any;
 

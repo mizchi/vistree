@@ -1,6 +1,13 @@
+const path = require("path");
 const MonacoPlugin = require("monaco-editor-webpack-plugin");
 const HtmlPlugin = require("html-webpack-plugin");
 module.exports = {
+  entry: {
+    main: path.join(__dirname, "src/index"),
+  },
+  output: {
+    path: path.join(__dirname, "dist"),
+  },
   module: {
     rules: [
       {
@@ -13,7 +20,6 @@ module.exports = {
           {
             loader: "ts-loader",
             options: {
-              // configFile: "webpack.tsconfig.json",
               transpileOnly: true,
             },
           },
@@ -48,7 +54,7 @@ module.exports = {
   plugins: [
     new MonacoPlugin(),
     new HtmlPlugin({
-      template: "src/index.html",
+      template: path.join(__dirname, "src/index.html"),
     }),
   ],
 };
