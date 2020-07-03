@@ -2,26 +2,32 @@ import React, { useContext, useRef } from "react";
 import ts from "typescript";
 import styled from "styled-components";
 
-const SourceContext = React.createContext<ts.SourceFile>(null as any);
-const HandlerContext = React.createContext<
-  (old: ts.Node, next: ts.Node) => void
->(null as any);
+export type RenderTreeOptions = {
+  root: ts.SourceFile;
+  onChangeNode: (prev: ts.Node, next: ts.Node) => void;
+  replaceNode?(node: ts.Node): React.ReactNode | void;
+};
+const RenderContext = React.createContext<RenderTreeOptions>(null as any);
 
-export function RootTree(props: {
-  tree: ts.SourceFile;
-  onChangeNode: (old: ts.Node, next: ts.Node) => void;
-}) {
+export function RootTree(props: RenderTreeOptions) {
   return (
-    <SourceContext.Provider value={props.tree}>
-      <HandlerContext.Provider value={props.onChangeNode}>
-        <Tree tree={props.tree} />
-      </HandlerContext.Provider>
-    </SourceContext.Provider>
+    <RenderContext.Provider value={props}>
+      <Container>
+        <Tree tree={props.root} />
+      </Container>
+    </RenderContext.Provider>
   );
 }
 
 function Tree({ tree }: { tree: ts.Node }) {
-  const onChangeNode = useContext(HandlerContext);
+  const { replaceNode } = useContext(RenderContext);
+
+  const replaced = replaceNode?.(tree);
+  return <>{replaced || <CodeTree tree={tree} />}</>;
+}
+
+function CodeTree({ tree }: { tree: ts.Node }) {
+  const { onChangeNode } = useContext(RenderContext);
   switch (tree.kind) {
     // Root
     case ts.SyntaxKind.Block:
@@ -49,32 +55,31 @@ function Tree({ tree }: { tree: ts.Node }) {
     // Expression
     case ts.SyntaxKind.Identifier: {
       const t = tree as ts.Identifier;
-      const ref = useRef<HTMLSpanElement>(null);
-      return (
-        <input
-          value={t.text}
-          style={{
-            background: "#222",
-            color: "#eee",
-            border: "none",
-            outline: "1px solid #ccc",
-            fontFamily:
-              "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace",
-            width: `${t.text.length * 8 + 6}px`,
-          }}
-          onChange={(ev) => {
-            const value = ev.target.value;
-            ev.target.style.width = `${value.length * 8 + 6}px`;
-            // console.log("change to", value);
-            onChangeNode(t, ts.createIdentifier(value));
-            // onChange(ev.target.value, t.pos, t.end);
-          }}
-        />
-      );
+      return <>{t.text}</>;
+
+      // const ref = useRef<HTMLSpanElement>(null);
+      // return (
+      //   <input
+      //     value={t.text}
+      //     style={{
+      //       background: "#222",
+      //       color: "#eee",
+      //       border: "none",
+      //       outline: "1px solid #ccc",
+      //       fontFamily:
+      //         "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace",
+      //       width: `${t.text.length * 8 + 6}px`,
+      //     }}
+      //     onChange={(ev) => {
+      //       const value = ev.target.value;
+      //       ev.target.style.width = `${value.length * 8 + 6}px`;
+      //       onChangeNode(t, ts.createIdentifier(value));
+      //     }}
+      //   />
+      // );
     }
     case ts.SyntaxKind.PropertyDeclaration: {
       const t = tree as ts.PropertyDeclaration;
-      console.log(t);
       return (
         <>
           {t.modifiers && <Modifiers modifiers={t.modifiers} />}
@@ -871,20 +876,13 @@ function Tree({ tree }: { tree: ts.Node }) {
       else declType = "var";
 
       const children = t.declarations.map((decl, idx) => {
-        let el: React.ReactNode;
-        if (ts.isIdentifier(decl.name)) {
-          el = <Tree tree={decl.name} />;
-        } else {
-          el = <Tree tree={decl.name} />;
-        }
-
         let initializer;
         if (decl.initializer) {
           initializer = <Tree tree={decl.initializer} />;
         }
         return (
           <span key={idx}>
-            {el}
+            <Tree tree={decl.name} />
             {decl.type && (
               <>
                 :&nbsp;
@@ -1435,3 +1433,14 @@ const Literal = styled.span`
 function IndentBlock(props: { children: any }) {
   return <div style={{ paddingLeft: "1rem" }}>{props.children}</div>;
 }
+
+const Container = styled.div`
+  color: #eee;
+  background: #222;
+  flex: 1;
+  height: 100%;
+  font-size: 18px;
+  line-height: 24px;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
+    monospace;
+`;

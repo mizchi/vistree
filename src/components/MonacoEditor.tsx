@@ -1,6 +1,8 @@
 import * as monaco from "monaco-editor";
 import { format } from "../worker/prettier.worker";
 import React, { useEffect, useRef, useState } from "react";
+import { loadDtsFiles } from "../helper/monacoHelper";
+
 declare var ResizeObserver: any;
 
 monaco.languages.typescript.typescriptDefaults.getEagerModelSync();
@@ -11,6 +13,34 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   allowSyntheticDefaultImports: true,
   target: monaco.languages.typescript.ScriptTarget.Latest,
 });
+
+const importMap = {
+  imports: {
+    react: "https://cdn.jsdelivr.net/npm/react@16.9.0/index.js",
+    "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.9.0/index.js",
+    typescript:
+      "https://cdn.jsdelivr.net/npm/typescript@4.0.0-dev.20200628/lib/typescript.js",
+  },
+  types: {
+    react: {
+      "index.d.ts":
+        "https://cdn.jsdelivr.net/npm/@types/react@16.9.0/index.d.ts",
+      "global.d.ts":
+        "https://cdn.jsdelivr.net/npm/@types/react@16.9.0/global.d.ts",
+    },
+    "react-dom":
+      "https://cdn.jsdelivr.net/npm/@types/react-dom@16.9.0/index.d.ts",
+    typescript:
+      "https://cdn.jsdelivr.net/npm/typescript@4.0.0-dev.20200628/lib/typescript.d.ts",
+  },
+};
+
+loadDtsFiles(monaco, importMap.types);
+
+monaco.languages.typescript.typescriptDefaults.addExtraLib(
+  `declare module "*";`,
+  "file:///decls.d.ts"
+);
 
 monaco.languages.registerDocumentFormattingEditProvider("typescript", {
   async provideDocumentFormattingEdits(model) {
@@ -23,13 +53,6 @@ monaco.languages.registerDocumentFormattingEditProvider("typescript", {
     ];
   },
 });
-
-monaco.languages.typescript.typescriptDefaults.addExtraLib(
-  `declare module "*";`,
-  "file:///decls.d.ts"
-);
-
-// ----------------------
 
 export default React.memo(function MonacoEditor(props: {
   initialCode: string;
@@ -69,7 +92,6 @@ export default React.memo(function MonacoEditor(props: {
           editor.getAction("editor.action.formatDocument").run();
         }
       );
-
       editor.onDidChangeModelContent(() => {
         props.onChange(editor.getValue());
       });
@@ -82,7 +104,7 @@ export default React.memo(function MonacoEditor(props: {
         editor.layout();
       });
       resizeObserver.observe(ref.current);
-      return () => {};
+      return () => resizeObserver.unobserve(ref.current);
     }
   }, [ref]);
   useEffect(() => {
