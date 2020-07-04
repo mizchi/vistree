@@ -32,45 +32,23 @@ export function App() {
     setEditor,
   ] = useState<null | monaco.editor.IStandaloneCodeEditor>(null);
 
-  useEffect(() => {
-    const fn = (ev: KeyboardEvent) => {
-      if (ev.ctrlKey && ev.key === "1") {
-        setMode(EditMode.Code);
-        return;
-      }
-      if (ev.ctrlKey && ev.key === "2") {
-        setMode(EditMode.Visual);
-        return;
-      }
-      if (ev.ctrlKey && ev.key === "3") {
-        setMode(EditMode.CodeAndVisual);
-        return;
-      }
-    };
-    window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
-  }, []);
-
   const onInit = useCallback((ed) => {
     setEditor(ed);
   }, []);
 
-  const onChangeCode = useCallback(
-    (value: string) => {
-      if (mode === EditMode.CodeAndVisual) {
-        const ast = parseCode(value);
-        setAst(ast);
-      }
-    },
-    [mode]
-  );
+  const onChangeCode = useCallback((value: string) => {
+    if (mode === EditMode.CodeAndVisual) {
+      const ast = parseCode(value);
+      setAst(ast);
+    }
+  }, []);
 
   const onChangeAst = useCallback(
     async (prev: ts.Node, next: ts.Node) => {
       const newAst = rewriteAst(ast, prev, next);
       setAst(newAst);
       if (mode === EditMode.CodeAndVisual) {
-        const newCode = await printCodeWithFormat(ast);
+        const newCode = await printCodeWithFormat(newAst);
         setCode(newCode);
         setCheckpointCode(newCode);
       }
@@ -207,7 +185,7 @@ function Header(props: {
   return (
     <div style={{ display: "flex" }}>
       <div>
-        <button disabled={props.mode === EditMode.Code} onClick={onClickCode}>
+        {/* <button disabled={props.mode === EditMode.Code} onClick={onClickCode}>
           code[Ctrl-1]
         </button>
         <button
@@ -221,7 +199,7 @@ function Header(props: {
           onClick={onClickVisualAndCode}
         >
           both[Ctrl-3]
-        </button>
+        </button> */}
       </div>
       <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
         <div>

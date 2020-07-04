@@ -54,6 +54,7 @@ monaco.languages.registerDocumentFormattingEditProvider("typescript", {
   },
 });
 
+let stopUpdating = false;
 export default React.memo(function MonacoEditor(props: {
   initialCode: string;
   onChange: (value: string) => void;
@@ -99,6 +100,10 @@ export default React.memo(function MonacoEditor(props: {
         }
       );
       editor.onDidChangeModelContent(() => {
+        if (stopUpdating) {
+          // console.log("stop update by props.initialCode");
+          return;
+        }
         props.onChange(editor.getValue());
       });
       setEditor(editor);
@@ -115,7 +120,10 @@ export default React.memo(function MonacoEditor(props: {
   }, [ref]);
   useEffect(() => {
     if (editor) {
+      // Stop update. it will take by other change
+      stopUpdating = true;
       editor.setValue(props.initialCode);
+      stopUpdating = false;
     }
   }, [props.initialCode, editor]);
   return <div ref={ref} style={{ height: "100%", width: "100%" }}></div>;
