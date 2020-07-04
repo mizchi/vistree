@@ -26,14 +26,14 @@ export function EditableTree(props: {
 function EditableRenderer({ tree }: { tree: ts.Node }) {
   const { context } = useRendererContext<EditableContext>();
   switch (tree.kind) {
-    case ts.SyntaxKind.Identifier: {
-      return (
-        <EditableIdentifier
-          identifier={tree as ts.Identifier}
-          onChangeNode={context.onChangeNode}
-        />
-      );
-    }
+    // case ts.SyntaxKind.Identifier: {
+    //   return (
+    //     <EditableIdentifier
+    //       identifier={tree as ts.Identifier}
+    //       onChangeNode={context.onChangeNode}
+    //     />
+    //   );
+    // }
     case ts.SyntaxKind.StringLiteral: {
       return (
         <EditableStringLiteral
@@ -42,6 +42,35 @@ function EditableRenderer({ tree }: { tree: ts.Node }) {
         />
       );
     }
+    case ts.SyntaxKind.NoSubstitutionTemplateLiteral: {
+      return (
+        <EditableNoSubstitutionTemplateLiteral
+          templateLiteral={tree as ts.NoSubstitutionTemplateLiteral}
+          onChangeNode={context.onChangeNode}
+        />
+      );
+    }
+
+    case ts.SyntaxKind.NumericLiteral: {
+      return (
+        <EditableNumericLiteral
+          numericLiteral={tree as ts.NumericLiteral}
+          onChangeNode={context.onChangeNode}
+        />
+      );
+    }
+
+    case ts.SyntaxKind.TrueKeyword:
+    case ts.SyntaxKind.FalseKeyword:
+    case ts.SyntaxKind.BooleanKeyword: {
+      return (
+        <EditableBooleanLiteral
+          booleanLiteral={tree as ts.BooleanLiteral}
+          onChangeNode={context.onChangeNode}
+        />
+      );
+    }
+
     default: {
       return <VisualCodeTree tree={tree} />;
     }
@@ -54,23 +83,6 @@ const padding = 3;
 function getLiteralWidth(len: number) {
   return padding * 2 + len * 11;
 }
-
-const Input = styled.input.attrs({
-  autoComplete: "off",
-})`
-  background: #222;
-  color: #eee;
-  border: none;
-  outline: none;
-  min-width: 0.5em;
-  padding: ${padding}px;
-  font-size: ${fontSize}px;
-  box-sizing: border-box;
-  /* outline: 1px solid #ccc; */
-  border-bottom: 1px solid #ccc;
-  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
-    monospace;
-`;
 
 export function EditableIdentifier({
   identifier,
@@ -94,7 +106,43 @@ export function EditableIdentifier({
   );
 }
 
-export function EditableStringLiteral({
+function EditableNoSubstitutionTemplateLiteral({
+  templateLiteral,
+  onChangeNode,
+}: {
+  templateLiteral: ts.NoSubstitutionTemplateLiteral;
+  onChangeNode: (
+    prev: ts.NoSubstitutionTemplateLiteral,
+    next: ts.NoSubstitutionTemplateLiteral
+  ) => void;
+}) {
+  // const { root } = useRendererContext();
+  // const raw = templateLiteral.getFullText(root);
+  return (
+    <>
+      {"`"}
+      <div>
+        <Textarea
+          style={{
+            width: "100%",
+            minHeight: "120px",
+          }}
+          value={templateLiteral.text}
+          onChange={(ev: any) => {
+            const value = ev.target.value;
+            onChangeNode(
+              templateLiteral,
+              ts.createNoSubstitutionTemplateLiteral(value)
+            );
+          }}
+        />
+      </div>
+      {"`"}
+    </>
+  );
+}
+
+function EditableStringLiteral({
   stringLiteral,
   onChangeNode,
 }: {
@@ -119,6 +167,34 @@ export function EditableStringLiteral({
         }}
       />
       {'"'}
+    </>
+  );
+}
+
+function EditableNumericLiteral({
+  numericLiteral,
+  onChangeNode,
+}: {
+  numericLiteral: ts.NumericLiteral;
+  onChangeNode: (prev: ts.NumericLiteral, next: ts.NumericLiteral) => void;
+}) {
+  return (
+    <>
+      <Input
+        type="number"
+        value={numericLiteral.text}
+        style={{
+          color: "#ce9178",
+          width: `${getLiteralWidth(numericLiteral.text.length) + 16}px`,
+        }}
+        onChange={(ev: any) => {
+          const value = Number(ev.target.value) as number;
+          ev.target.style.width = `${
+            getLiteralWidth(numericLiteral.text.length) + 16
+          }px`;
+          onChangeNode(numericLiteral, ts.createNumericLiteral(value));
+        }}
+      />
     </>
   );
 }
@@ -152,14 +228,63 @@ function EditableBooleanLiteral({
   onChangeNode,
 }: {
   booleanLiteral: ts.BooleanLiteral;
-  onChangeNode: (prev: ts.JsxText, next: ts.JsxText) => void;
+  onChangeNode: (prev: ts.BooleanLiteral, next: ts.BooleanLiteral) => void;
 }) {
   return (
     <>
-      <select>
-        <option>true</option>
-        <option>false</option>
+      <select
+        value={
+          booleanLiteral.kind === ts.SyntaxKind.TrueKeyword ? "true" : "false"
+        }
+        onChange={(ev) => {
+          const value = ev.target.value as "true" | "false";
+          onChangeNode(
+            booleanLiteral,
+            value === "true" ? ts.createTrue() : ts.createFalse()
+          );
+        }}
+      >
+        <option value="true">true</option>
+        <option value="false">false</option>
       </select>
     </>
   );
 }
+
+const Input = styled.input.attrs({
+  autoComplete: "off",
+  spellcheck: "false",
+})`
+  background: #222;
+  color: #eee;
+  border: none;
+  outline: none;
+  min-width: 0.5em;
+  padding: ${padding}px;
+  font-size: ${fontSize}px;
+  box-sizing: border-box;
+  /* outline: 1px solid #ccc; */
+  border-bottom: 1px solid #ccc;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
+    monospace;
+`;
+
+const Textarea = styled.textarea.attrs({
+  autoComplete: "off",
+  spellcheck: "false",
+})`
+  white-space: pre-wrap;
+  background: #222;
+  color: #eee;
+  box-sizing: border-box;
+  border: 1px dashed white;
+  outline: 1px solid black;
+  min-width: 0.5em;
+  padding: ${padding}px;
+  font-size: ${fontSize}px;
+  box-sizing: border-box;
+  /* outline: 1px solid #ccc; */
+  /* border-bottom: 1px solid #ccc; */
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
+    monospace;
+`;

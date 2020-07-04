@@ -353,7 +353,7 @@ export function VisualCodeTree({ tree }: { tree: ts.Node }) {
       return (
         <span>
           {"`"}
-          {t.text}
+          <span style={{ whiteSpace: "pre-wrap", margin: 0 }}>{t.text}</span>
           {"`"}
         </span>
       );
@@ -620,7 +620,10 @@ export function VisualCodeTree({ tree }: { tree: ts.Node }) {
       return (
         <span>
           <Tree tree={t.expression} />(
-          <Arguments arguments={t.arguments} />)
+          <IndentBlock>
+            <Arguments arguments={t.arguments} />
+          </IndentBlock>
+          )
           {t.typeArguments && (
             <>
               <TypeArguments typeArguments={t.typeArguments} />
@@ -851,7 +854,8 @@ export function VisualCodeTree({ tree }: { tree: ts.Node }) {
     case ts.SyntaxKind.VariableDeclarationList: {
       const t = tree as ts.VariableDeclarationList;
       let declType;
-      if (t.flags === ts.NodeFlags.Const) declType = "const";
+      // TODO: Why 10?
+      if (t.flags === ts.NodeFlags.Const || t.flags === 10) declType = "const";
       else if (t.flags === ts.NodeFlags.Let) declType = "let";
       else declType = "var";
 
@@ -1048,7 +1052,10 @@ export function VisualCodeTree({ tree }: { tree: ts.Node }) {
             })}
           <Keyword>function</Keyword>&nbsp;
           {t.name && <Tree tree={t.name} />}(
-          <Parameters parameters={t.parameters} />) {"{"}
+          <IndentBlock>
+            <Parameters parameters={t.parameters} />
+          </IndentBlock>
+          ) {"{"}
           {t.body && <Tree tree={t.body} />}
           {"}"}
         </div>
@@ -1376,17 +1383,17 @@ function Arguments(props: { arguments: ts.NodeArray<ts.Expression> }) {
   const { Renderer: Tree } = useContext(RendererContext);
 
   return (
-    <>
+    <div>
       {props.arguments.map((arg, key) => {
         const isLastArg = key === props.arguments.length - 1;
         return (
-          <span key={key}>
+          <div key={key}>
             <Tree tree={arg} />
             {!isLastArg && ", "}
-          </span>
+          </div>
         );
       })}
-    </>
+    </div>
   );
 }
 
@@ -1396,17 +1403,17 @@ function Parameters(props: {
   const { Renderer: Tree } = useContext(RendererContext);
 
   return (
-    <>
+    <div>
       {props.parameters.map((p, i) => {
         const isLastArg = i === props.parameters.length - 1;
         return (
-          <span key={i}>
+          <div key={i}>
             <Tree tree={p} key={i} />
             {!isLastArg && ", "}
-          </span>
+          </div>
         );
       })}
-    </>
+    </div>
   );
 }
 

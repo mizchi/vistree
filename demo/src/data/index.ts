@@ -6,7 +6,7 @@ import reactStyled from "!!raw-loader!../data/react-styled.tsx";
 
 export const TEMPLATES = {
   "helloworld.ts": helloworld,
-  "constants.ts": constants,
-  "react-styled.tsx": reactStyled,
+  // "constants.ts": constants,
+  // "react-styled.tsx": reactStyled,
   "tree.tsx": tree,
 };

@@ -32,7 +32,7 @@ export const Root = styled.div`
   color: #eee;
   background: #222;
   display: grid;
-  grid-template-rows: 40px 1fr;
+  grid-template-rows: 32px 1fr;
   grid-template-columns: 1fr;
   grid-template-areas:
     "header"
