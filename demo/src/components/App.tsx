@@ -3,7 +3,7 @@ import ts from "typescript";
 import type * as monaco from "monaco-editor";
 import { astToCode } from "../worker/typescript.worker";
 import { format } from "../worker/prettier.worker";
-import { parseCode, rewriteAst } from "../../../src/helper/tsHelper";
+import { parseCode, rewriteSource } from "../../../src/astHelper";
 import { Scrollable, HeaderContainer, Root, ContentContainer } from "./layout";
 import { TEMPLATES } from "../data";
 import { EditableTree } from "./EditableTree";
@@ -42,7 +42,7 @@ export function App() {
 
   const onChangeNode = useCallback(
     async (prev: ts.Node, next: ts.Node) => {
-      const newAst = rewriteAst(ast, prev, next);
+      const newAst = rewriteSource(ast, prev, next);
       setAst(newAst);
       if (mode === EditMode.CodeAndVisual) {
         const newCode = await printCodeWithFormat(newAst);

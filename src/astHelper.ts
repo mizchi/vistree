@@ -13,7 +13,11 @@ export function parseCode(value: string) {
   return ret;
 }
 
-export function rewriteAst(ast: ts.SourceFile, prev: ts.Node, next: ts.Node) {
+export function rewriteSource(
+  ast: ts.SourceFile,
+  prev: ts.Node,
+  next: ts.Node
+) {
   function rewriter(): ts.TransformerFactory<ts.Node> {
     return (context) => {
       const visit: ts.Visitor = (node) => {

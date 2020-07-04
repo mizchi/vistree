@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 export type RendererTreeOptions<T = void> = {
   root: ts.SourceFile;
-  Renderer: React.ComponentType<{ tree: ts.Node }>;
+  renderer: React.ComponentType<{ tree: ts.Node }>;
   context: T;
 };
 
@@ -16,8 +16,8 @@ export function useRendererContext<T>(): RendererTreeOptions<T> {
   return useContext(RendererContext);
 }
 
-export function RootRenderer<T>(props: RendererTreeOptions<T>) {
-  const Renderer = props.Renderer;
+export function VisualTree<T>(props: RendererTreeOptions<T>) {
+  const Renderer = props.renderer;
   return (
     <RendererContext.Provider value={props}>
       <Container>
@@ -27,8 +27,8 @@ export function RootRenderer<T>(props: RendererTreeOptions<T>) {
   );
 }
 
-export function VisualCodeTree({ tree }: { tree: ts.Node }) {
-  const { Renderer: Tree } = useContext(RendererContext);
+export function CodeRenderer({ tree }: { tree: ts.Node }) {
+  const { renderer: Tree } = useContext(RendererContext);
   switch (tree.kind) {
     // Root
     case ts.SyntaxKind.Block:
@@ -1313,7 +1313,7 @@ export function VisualCodeTree({ tree }: { tree: ts.Node }) {
 }
 
 function Modifiers(props: { modifiers: ts.ModifiersArray }) {
-  const { Renderer: Tree } = useContext(RendererContext);
+  const { renderer: Tree } = useContext(RendererContext);
   return (
     <>
       {props.modifiers.map((mod, idx) => {
@@ -1339,7 +1339,7 @@ function UnknownDump(props: { tree: ts.Node }) {
 }
 
 function TypeArguments(props: { typeArguments: ts.NodeArray<ts.TypeNode> }) {
-  const { Renderer: Tree } = useContext(RendererContext);
+  const { renderer: Tree } = useContext(RendererContext);
   return (
     <>
       {"<"}
@@ -1360,7 +1360,7 @@ function TypeArguments(props: { typeArguments: ts.NodeArray<ts.TypeNode> }) {
 function TypeParameters(props: {
   typeParameters: ts.NodeArray<ts.TypeParameterDeclaration>;
 }) {
-  const { Renderer: Tree } = useContext(RendererContext);
+  const { renderer: Tree } = useContext(RendererContext);
 
   return (
     <>
@@ -1380,7 +1380,7 @@ function TypeParameters(props: {
 }
 
 function Arguments(props: { arguments: ts.NodeArray<ts.Expression> }) {
-  const { Renderer: Tree } = useContext(RendererContext);
+  const { renderer: Tree } = useContext(RendererContext);
 
   return (
     <div>
@@ -1400,7 +1400,7 @@ function Arguments(props: { arguments: ts.NodeArray<ts.Expression> }) {
 function Parameters(props: {
   parameters: ts.NodeArray<ts.ParameterDeclaration>;
 }) {
-  const { Renderer: Tree } = useContext(RendererContext);
+  const { renderer: Tree } = useContext(RendererContext);
 
   return (
     <div>

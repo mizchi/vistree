@@ -3,10 +3,10 @@ import ts from "typescript";
 import styled from "styled-components";
 
 import {
-  RootRenderer,
-  VisualCodeTree,
+  VisualTree,
+  CodeRenderer,
   useRendererContext,
-} from "../../../src/Tree";
+} from "../../../src/VisualTree";
 
 type EditableContext = { onChangeNode: (prev: ts.Node, next: ts.Node) => void };
 
@@ -15,8 +15,8 @@ export function EditableTree(props: {
   onChangeNode: (prev: ts.Node, next: ts.Node) => void;
 }) {
   return (
-    <RootRenderer
-      Renderer={EditableRenderer}
+    <VisualTree
+      renderer={EditableRenderer}
       root={props.ast}
       context={{ onChangeNode: props.onChangeNode }}
     />
@@ -72,7 +72,7 @@ function EditableRenderer({ tree }: { tree: ts.Node }) {
     }
 
     default: {
-      return <VisualCodeTree tree={tree} />;
+      return <CodeRenderer tree={tree} />;
     }
   }
 }
