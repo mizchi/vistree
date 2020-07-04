@@ -1,12 +1,10 @@
 {
-  "name": "visual-editor",
-  "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
   "license": "MIT",
   "scripts": {
-    "dev": "webpack-dev-server --config demo/webpack.config.js --port 8100",
-    "demo:build": "webpack --config demo/webpack.config.js --mode production",
-    "demo:deploy": "netlify deploy -d demo/dist --prod"
+    "dev": "yarn --cwd packages/visual-workspace webpack-dev-server --port 8100",
+    "demo:build": "yarn workspaces -pt run build",
+    "demo:deploy": "netlify deploy -d packages/visual-workspace/dist --prod"
   },
   "dependencies": {
     "monaco-editor": "^0.20.0",
@@ -24,6 +22,7 @@
     "css-loader": "^3.6.0",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
+    "lerna": "^3.20.2",
     "monaco-editor-webpack-plugin": "^1.9.0",
     "raw-loader": "^4.0.1",
     "style-loader": "^1.2.1",
@@ -35,6 +34,9 @@
     "webpack-dev-server": "^3.11.0",
     "worker-plugin": "^4.0.3"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "peerDependencies": {
     "typescript": "*"
   }

@@ -1,0 +1,21 @@
+{
+  "name": "visual-editable-tree",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "prepublishOnly": "yarn build",
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "visual-code-tree": "0.0.0"
+  },
+  "peerDependencies": {
+    "visual-code-tree": "*",
+    "typescript": "*"
+  },
+  "files": [
+    "lib"
+  ]
+}

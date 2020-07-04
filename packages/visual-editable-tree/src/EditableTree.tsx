@@ -6,7 +6,7 @@ import {
   VisualTree,
   CodeRenderer,
   useRendererContext,
-} from "../../../src/VisualTree";
+} from "visual-code-tree/src";
 
 type EditableContext = { onChangeNode: (prev: ts.Node, next: ts.Node) => void };
 

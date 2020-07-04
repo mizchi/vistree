@@ -1,0 +1,22 @@
+{
+  "name": "visual-code-tree",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "prepublishOnly": "yarn build",
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "styled-components": "^5.1.1",
+    "typescript": "^4.0.0-dev.20200704"
+  },
+  "peerDependencies": {
+    "typescript": "*",
+    "styled-components": "*"
+  },
+  "files": [
+    "lib"
+  ]
+}

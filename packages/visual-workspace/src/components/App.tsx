@@ -3,10 +3,10 @@ import ts from "typescript";
 import type * as monaco from "monaco-editor";
 import { astToCode } from "../worker/typescript.worker";
 import { format } from "../worker/prettier.worker";
-import { parseCode, rewriteSource } from "../../../src/astHelper";
+import { parseCode, rewriteSource } from "visual-code-tree";
 import { Scrollable, HeaderContainer, Root, ContentContainer } from "./layout";
 import { TEMPLATES } from "../data";
-import { EditableTree } from "./EditableTree";
+import { VisualEditableTree } from "visual-editable-tree";
 
 const MonacoEditor = React.lazy(() => import("./MonacoEditor"));
 
@@ -120,7 +120,7 @@ export function App() {
             >
               <Scrollable>
                 <div style={{ padding: 3 }}>
-                  <EditableTree ast={ast} onChangeNode={onChangeNode} />
+                  <VisualEditableTree ast={ast} onChangeNode={onChangeNode} />
                 </div>
               </Scrollable>
             </div>

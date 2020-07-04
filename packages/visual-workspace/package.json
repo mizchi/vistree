@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "name": "visual-workspace",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack --mode production"
+  },
+  "dependencies": {
+    "visual-code-tree": "0.0.0",
+    "visual-editable-tree": "0.0.0",
+    "monaco-editor": "^0.20.0",
+    "prettier": "^2.0.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "styled-components": "^5.1.1",
+    "typescript": "^4.0.0-dev.20200704"
+  }
+}
