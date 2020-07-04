@@ -7,6 +7,7 @@ export type RenderTreeOptions = {
   onChangeNode: (prev: ts.Node, next: ts.Node) => void;
   replaceNode?(node: ts.Node): React.ReactNode | void;
 };
+
 const RenderContext = React.createContext<RenderTreeOptions>(null as any);
 
 export function RootTree(props: RenderTreeOptions) {
@@ -27,7 +28,7 @@ function Tree({ tree }: { tree: ts.Node }) {
 }
 
 function CodeTree({ tree }: { tree: ts.Node }) {
-  const { onChangeNode } = useContext(RenderContext);
+  // const { onChangeNode } = useContext(RenderContext);
   switch (tree.kind) {
     // Root
     case ts.SyntaxKind.Block:

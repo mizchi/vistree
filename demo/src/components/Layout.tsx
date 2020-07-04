@@ -1,65 +1,56 @@
 import React from "react";
+import styled from "styled-components";
 
-export function Layout(props: {
-  left: React.ReactNode;
-  right: React.ReactNode;
-}) {
+export function Scrollable(props: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "row",
-        width: "100%",
-        height: "100%",
+        position: "absolute",
+        left: 0,
+        top: 0,
+        bottom: 0,
+        right: 0,
       }}
     >
-      <div style={{ flex: 1, height: "100%", maxWidth: "50%" }}>
-        {props.left}
-      </div>
       <div
         style={{
-          position: "relative",
-          color: "#eee",
-          background: "#222",
-          flex: 1,
+          overflowY: "auto",
+          overflowX: "auto",
           height: "100%",
+          whiteSpace: "nowrap",
         }}
       >
-        <Scrollable>{props.right}</Scrollable>
+        {props.children}
       </div>
     </div>
   );
 }
 
-function Scrollable(props: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          bottom: 0,
-          right: 0,
-        }}
-      >
-        <div
-          style={{
-            overflowY: "auto",
-            overflowX: "auto",
-            height: "100%",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {props.children}
-        </div>
-      </div>
-    </div>
-  );
-}
+export const Root = styled.div`
+  width: 100%;
+  height: 100%;
+  color: #eee;
+  background: #222;
+  display: grid;
+  grid-template-rows: 40px 1fr;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "header"
+    "content";
+`;
+
+export const HeaderContainer = styled.div`
+  grid-area: header;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+`;
+
+export const ContentContainer = styled.div`
+  grid-area: content;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+`;

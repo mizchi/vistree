@@ -66,12 +66,18 @@ export default React.memo(function MonacoEditor(props: {
   ] = useState<null | monaco.editor.IStandaloneCodeEditor>(null);
   useEffect(() => {
     if (ref.current) {
-      const model = monaco.editor.createModel(
-        props.initialCode,
-        "typescript",
-        monaco.Uri.parse("file:///index.tsx")
-      );
-      model.updateOptions({ tabSize: 2 });
+      let model = monaco.editor.getModels().find((t) => {
+        return t.uri.path === "/index.tsx";
+        // console.log(t.uri.path);
+      });
+      if (model == null) {
+        model = monaco.editor.createModel(
+          props.initialCode,
+          "typescript",
+          monaco.Uri.parse("file:///index.tsx")
+        );
+        model.updateOptions({ tabSize: 2 });
+      }
 
       const editor = monaco.editor.create(ref.current, {
         model,

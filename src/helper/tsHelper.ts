@@ -1,6 +1,6 @@
 import ts from "typescript";
 
-export function parseTypeScript(value: string) {
+export function parseCode(value: string) {
   console.time("parse");
   const ret = ts.createSourceFile(
     "file:///index.ts",
