@@ -1,5 +1,5 @@
 {
-  "name": "vistree-editable",
+  "name": "@mizchi/vistree-editable",
   "version": "0.0.0",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -9,10 +9,10 @@
     "build": "tsc -p ."
   },
   "devDependencies": {
-    "vistree": "0.0.0"
+    "@mizchi/vistree": "0.0.0"
   },
   "peerDependencies": {
-    "vistree": "*",
+    "@mizchi/vistree": "*",
     "typescript": "*"
   },
   "files": [

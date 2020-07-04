@@ -3,10 +3,11 @@ import ts from "typescript";
 import type * as monaco from "monaco-editor";
 import { astToCode } from "../worker/typescript.worker";
 import { format } from "../worker/prettier.worker";
-import { parseCode, rewriteSource } from "vistree";
 import { Scrollable, HeaderContainer, Root, ContentContainer } from "./layout";
 import { TEMPLATES } from "../data";
-import { VisualEditableTree } from "vistree-editable";
+
+import { parseCode, rewriteSource } from "@mizchi/vistree";
+import { VisualEditableTree } from "@mizchi/vistree-editable";
 
 const MonacoEditor = React.lazy(() => import("./MonacoEditor"));
 

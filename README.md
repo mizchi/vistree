@@ -1,21 +1,48 @@
-# visual-typescript-tree
+# vistree
+
+Visual TypeScript Editing Environment.
+
+Edit code editor and visual editor each other.
+
+## Philosophy and Goal
+
+Today's no-code and low-code miss visual programming infastructure. All visual programming environments have turing complete semantics, after all.
+
+So as first step of visual programming, we need ast editor and generate both code and UI from it.
+
+TypeScript is best choice for general purpose like web(ui) and backend(node.js).
 
 ## packages
 
-- vistree
-- vistree-editable
-- workspace
+- `@mizchi/vistree`: Code Renderer
+- `@mizchi/vistree-editable`: Code Renderer with editable UI
+- `workspace`: Playground of `@mizchi/vistree-editable`
 
-## What's this?
+## Development
 
-Render typescript ast.
+```
+yarn install
+yarn build
+yarn dev
+```
+
+## Deploy
+
+```
+# Install netlify
+yarn deploy
+```
+
+---
+
+# @mizchi/vistree
+
+visual code editor infrastructure.
 
 ## Install
 
 ```bash
-npm install react react-dom visual-typescript-tree typescript --save
-# or
-yarn add react react-dom visual-typescript-tree typescript
+npm install @mizchi/viztree typescript react react-dom styled-components --save
 ```
 
 ## Example
@@ -26,12 +53,7 @@ Simple code renderer.
 import React from "react";
 import ts from "typescript";
 
-import {
-  VisualTree,
-  CodeRenderer,
-  useRendererContext,
-  // @ts-ignore
-} from "visual-typescript-tree";
+import { VisualTree, CodeRenderer, useRendererContext } from "@mizchi/viztree";
 
 type EditableContext = {};
 
@@ -78,11 +100,18 @@ function Renderer({ tree }: { tree: ts.Node }) {
 - [x] ObjectBindingPattern `const {} = {}`
 - [x] ArrayBindingPattern `const {} = {}`
 - [x] `foo!`
+- [x] monorepo
 
 ## Icebox
 
 - [ ] decolator
 - [ ] generator
+
+## Inspired by...
+
+- https://arcade.makecode.com/
+- [microsoft/pxt\-blockly: Blockly \(Microsoft MakeCode fork\)](https://github.com/microsoft/pxt-blockly)
+- [harukamm/ocaml\-blockly: OCaml visual programming editor based on Blockly\.](https://github.com/harukamm/ocaml-blockly)
 
 ## LICENSE
 

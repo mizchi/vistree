@@ -2,7 +2,7 @@ import React from "react";
 import ts from "typescript";
 import styled from "styled-components";
 
-import { VisualTree, CodeRenderer, useRendererContext } from "vistree/src";
+import { VisualTree, CodeRenderer, useRendererContext } from "@mizchi/vistree";
 
 type EditableContext = { onChangeNode: (prev: ts.Node, next: ts.Node) => void };
 

@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "yarn --cwd packages/workspace webpack-dev-server --port 8100",
     "build": "yarn workspaces -pt run build",
-    "deploy": "netlify deploy -d packages/visual-workspace/dist --prod"
+    "deploy": "yarn build && netlify deploy -d packages/workspace/dist --prod"
   },
   "devDependencies": {
     "@types/prettier": "^2.0.1",
@@ -17,6 +17,7 @@
     "html-webpack-plugin": "^4.3.0",
     "lerna": "^3.20.2",
     "monaco-editor-webpack-plugin": "^1.9.0",
+    "netlify-cli": "^2.57.0",
     "raw-loader": "^4.0.1",
     "style-loader": "^1.2.1",
     "ts-loader": "^7.0.5",
