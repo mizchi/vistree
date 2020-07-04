@@ -1,15 +1,12 @@
-import React, { Suspense, useCallback, useState, useEffect } from "react";
+import React, { Suspense, useCallback, useState } from "react";
 import ts from "typescript";
 import type * as monaco from "monaco-editor";
 import { astToCode } from "../worker/typescript.worker";
 import { format } from "../worker/prettier.worker";
-
-// lib
-import { RootTree } from "../../../src/Tree";
 import { parseCode, rewriteAst } from "../../../src/helper/tsHelper";
 import { Scrollable, HeaderContainer, Root, ContentContainer } from "./layout";
-import { EditableStringLiteral } from "./rewriter";
 import { TEMPLATES } from "../data";
+import { EditableTree } from "./EditableTree";
 
 const MonacoEditor = React.lazy(() => import("./MonacoEditor"));
 
@@ -43,7 +40,7 @@ export function App() {
     }
   }, []);
 
-  const onChangeAst = useCallback(
+  const onChangeNode = useCallback(
     async (prev: ts.Node, next: ts.Node) => {
       const newAst = rewriteAst(ast, prev, next);
       setAst(newAst);
@@ -54,36 +51,6 @@ export function App() {
       }
     },
     [ast, mode]
-  );
-
-  const replaceNode = useCallback(
-    (tree: ts.Node) => {
-      if (tree.kind === ts.SyntaxKind.Identifier) {
-        return (
-          <EditableIdentifier
-            identifier={tree as ts.Identifier}
-            onChangeNode={onChangeAst}
-          />
-        );
-      }
-      if (tree.kind === ts.SyntaxKind.StringLiteral) {
-        return (
-          <EditableStringLiteral
-            stringLiteral={tree as ts.StringLiteral}
-            onChangeNode={onChangeAst}
-          />
-        );
-      }
-      // if (tree.kind === ts.SyntaxKind.JsxText) {
-      //   return (
-      //     <EditableJsxText
-      //       jsxText={tree as ts.JsxText}
-      //       onChangeNode={onChangeNode}
-      //     />
-      //   );
-      // }
-    },
-    [onChangeAst, mode]
   );
 
   const onChangeMode = useCallback(
@@ -107,7 +74,6 @@ export function App() {
     async (newCode: string) => {
       setCode(newCode);
       setCheckpointCode(newCode);
-
       const newAst = parseCode(newCode);
       setAst(newAst);
     },
@@ -153,11 +119,9 @@ export function App() {
               }}
             >
               <Scrollable>
-                <RootTree
-                  root={ast}
-                  onChangeNode={onChangeAst}
-                  replaceNode={replaceNode}
-                />
+                <div style={{ padding: 3 }}>
+                  <EditableTree ast={ast} onChangeNode={onChangeNode} />
+                </div>
               </Scrollable>
             </div>
           )}
@@ -220,34 +184,6 @@ function Header(props: {
         </div>
       </div>
     </div>
-  );
-}
-
-function EditableIdentifier({
-  identifier,
-  onChangeNode,
-}: {
-  identifier: ts.Identifier;
-  onChangeNode: (prev: ts.Identifier, next: ts.Identifier) => void;
-}) {
-  return (
-    <input
-      value={identifier.text}
-      style={{
-        background: "#222",
-        color: "#eee",
-        border: "none",
-        outline: "1px solid #ccc",
-        fontFamily:
-          "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace",
-        width: `${identifier.text.length * 8 + 6}px`,
-      }}
-      onChange={(ev) => {
-        const value = ev.target.value;
-        ev.target.style.width = `${value.length * 8 + 6}px`;
-        onChangeNode(identifier, ts.createIdentifier(value));
-      }}
-    />
   );
 }
 
