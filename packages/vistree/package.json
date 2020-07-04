@@ -1,5 +1,5 @@
 {
-  "name": "visual-editable-tree",
+  "name": "vistree",
   "version": "0.0.0",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -9,11 +9,12 @@
     "build": "tsc -p ."
   },
   "devDependencies": {
-    "visual-code-tree": "0.0.0"
+    "styled-components": "^5.1.1",
+    "typescript": "^4.0.0-dev.20200704"
   },
   "peerDependencies": {
-    "visual-code-tree": "*",
-    "typescript": "*"
+    "typescript": "*",
+    "styled-components": "*"
   },
   "files": [
     "lib"

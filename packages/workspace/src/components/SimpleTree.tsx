@@ -5,7 +5,7 @@
 //   VisualCodeTree,
 //   useRendererContext,
 //   // @ts-ignore
-// } from "visual-code-tree";
+// } from "vistree";
 
 // type EditableContext = {};
 

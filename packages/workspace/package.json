@@ -8,8 +8,8 @@
     "build": "webpack --mode production"
   },
   "dependencies": {
-    "visual-code-tree": "0.0.0",
-    "visual-editable-tree": "0.0.0",
+    "vistree": "0.0.0",
+    "vistree-editable": "0.0.0",
     "monaco-editor": "^0.20.0",
     "prettier": "^2.0.5",
     "react": "^16.13.1",

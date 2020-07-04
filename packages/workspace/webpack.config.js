@@ -54,8 +54,8 @@ module.exports = (_, argv) => {
       alias:
         argv.mode !== "production"
           ? {
-              "visual-code-tree": "visual-code-tree/src",
-              "visual-editable-tree": "visual-editable-tree/src",
+              vistree: "vistree/src",
+              "vistree-editable": "vistree-editable/src",
             }
           : {},
     },

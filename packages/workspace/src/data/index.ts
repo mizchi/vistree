@@ -1,4 +1,4 @@
-import tree from "!!raw-loader!visual-code-tree/src/VisualTree.tsx";
+import tree from "!!raw-loader!vistree/src/VisualTree.tsx";
 import helloworld from "!!raw-loader!./helloworld.ts";
 // import reactStyled from "!!raw-loader!../data/react-styled.tsx";
 

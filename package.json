@@ -2,16 +2,9 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "dev": "yarn --cwd packages/visual-workspace webpack-dev-server --port 8100",
-    "demo:build": "yarn workspaces -pt run build",
-    "demo:deploy": "netlify deploy -d packages/visual-workspace/dist --prod"
-  },
-  "dependencies": {
-    "monaco-editor": "^0.20.0",
-    "prettier": "^2.0.5",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "styled-components": "^5.1.1"
+    "dev": "yarn --cwd packages/workspace webpack-dev-server --port 8100",
+    "build": "yarn workspaces -pt run build",
+    "deploy": "netlify deploy -d packages/visual-workspace/dist --prod"
   },
   "devDependencies": {
     "@types/prettier": "^2.0.1",
