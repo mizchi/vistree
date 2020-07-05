@@ -6,8 +6,8 @@ import { format } from "../worker/prettier.worker";
 import { Scrollable, HeaderContainer, Root, ContentContainer } from "./layout";
 import { TEMPLATES } from "../data";
 
-import { parseCode, rewriteSource } from "@mizchi/vistree";
-import { VisualEditableTree } from "@mizchi/vistree-editable";
+import { parseCode, rewriteSource } from "@mizchi/vistree/src";
+import { VisualEditableTree } from "@mizchi/vistree-editable/src";
 
 const MonacoEditor = React.lazy(() => import("./MonacoEditor"));
 

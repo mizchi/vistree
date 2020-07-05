@@ -2,7 +2,11 @@ import React from "react";
 import ts from "typescript";
 import styled from "styled-components";
 
-import { VisualTree, CodeRenderer, useRendererContext } from "@mizchi/vistree";
+import {
+  VisualTree,
+  CodeRenderer,
+  useRendererContext,
+} from "@mizchi/vistree/src";
 
 type EditableContext = { onChangeNode: (prev: ts.Node, next: ts.Node) => void };
 
@@ -96,7 +100,8 @@ export function EditableIdentifier({
       onChange={(ev) => {
         const value = ev.target.value;
         ev.target.style.width = `${getLiteralWidth(value.length)}px`;
-        onChangeNode(identifier, ts.createIdentifier(value));
+        const newNode = ts.factory.createIdentifier(value);
+        onChangeNode(identifier, newNode);
       }}
     />
   );
@@ -126,6 +131,8 @@ function EditableNoSubstitutionTemplateLiteral({
           value={templateLiteral.text}
           onChange={(ev: any) => {
             const value = ev.target.value;
+            // const newNode = ts.getMutableClone(templateLiteral);
+            // newNode.text = value;
             onChangeNode(
               templateLiteral,
               ts.createNoSubstitutionTemplateLiteral(value)
@@ -159,7 +166,9 @@ function EditableStringLiteral({
           ev.target.style.width = `${getLiteralWidth(
             stringLiteral.text.length
           )}px`;
-          onChangeNode(stringLiteral, ts.createStringLiteral(value));
+          const newNode = ts.getMutableClone(stringLiteral);
+          newNode.text = value;
+          onChangeNode(stringLiteral, newNode);
         }}
       />
       {'"'}
@@ -188,7 +197,9 @@ function EditableNumericLiteral({
           ev.target.style.width = `${
             getLiteralWidth(numericLiteral.text.length) + 16
           }px`;
-          onChangeNode(numericLiteral, ts.createNumericLiteral(value));
+          const newNode = ts.getMutableClone(numericLiteral);
+          newNode.text = value.toString();
+          onChangeNode(numericLiteral, newNode);
         }}
       />
     </>
@@ -212,7 +223,9 @@ function EditableJsxText({
         onChange={(ev) => {
           const value = ev.target.value;
           ev.target.style.width = `${getLiteralWidth(jsxText.text.length)}px`;
-          onChangeNode(jsxText, ts.createJsxText(value));
+          const newNode = ts.getMutableClone(jsxText);
+          newNode.text = value;
+          onChangeNode(jsxText, newNode);
         }}
       />
     </>

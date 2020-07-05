@@ -21,10 +21,7 @@ export function rewriteSource(
   function rewriter(): ts.TransformerFactory<ts.Node> {
     return (context) => {
       const visit: ts.Visitor = (node) => {
-        const isSameNode = node.kind === prev.kind && node.pos === prev.pos;
-        if (isSameNode) {
-          return next;
-        }
+        if (prev === node) return next;
         return ts.visitEachChild(node, (child) => visit(child), context);
       };
       return (node) => ts.visitNode(node, visit);

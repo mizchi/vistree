@@ -33,17 +33,24 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
     // Root
     case ts.SyntaxKind.Block:
     case ts.SyntaxKind.SourceFile: {
-      const childrenNodes: React.ReactNode[] = [];
-      let key = 0;
-      ts.forEachChild(tree, (child: ts.Node) => {
-        if (child.kind === ts.SyntaxKind.EndOfFileToken) {
-          return;
-        }
-        childrenNodes.push(<Tree tree={child} key={key++} />);
-      });
-      return <IndentBlock>{childrenNodes}</IndentBlock>;
+      const t = tree as ts.Block;
+      return (
+        <>
+          {t.statements.map((stmt, idx) => (
+            <Tree tree={stmt} key={idx} />
+          ))}
+        </>
+      );
+      // const childrenNodes: React.ReactNode[] = [];
+      // let key = 0;
+      // ts.forEachChild(tree, (child: ts.Node) => {
+      //   if (child.kind === ts.SyntaxKind.EndOfFileToken) {
+      //     return;
+      //   }
+      //   childrenNodes.push(<Tree tree={child} key={key++} />);
+      // });
+      // return <IndentBlock>{childrenNodes}</IndentBlock>;
     }
-
     // Misc
     case ts.SyntaxKind.EndOfFileToken: {
       return <div>EoF</div>;
@@ -99,7 +106,11 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
             );
           })}
           ) {"{"}
-          {t.body && <Tree tree={t.body} />}
+          {t.body && (
+            <IndentBlock>
+              <Tree tree={t.body} />
+            </IndentBlock>
+          )}
           {"}"}
         </>
       );
@@ -775,10 +786,10 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
               {t.heritageClauses.map((h, idx) => {
                 const last: boolean = idx === t.heritageClauses!.length - 1;
                 return (
-                  <span key={idx}>
+                  <div key={idx}>
                     <Tree tree={h} />
-                    {!last && <>, </>}
-                  </span>
+                    {!last && <>;</>}
+                  </div>
                 );
               })}
             </>
@@ -942,11 +953,15 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
           {t.body.kind === ts.SyntaxKind.Block ? (
             <>
               {"{"}
-              <Tree tree={t.body} />
+              <IndentBlock>
+                <Tree tree={t.body} />
+              </IndentBlock>
               {"}"}
             </>
           ) : (
-            <Tree tree={t.body} />
+            <IndentBlock>
+              <Tree tree={t.body} />
+            </IndentBlock>
           )}
         </span>
       );
@@ -989,7 +1004,11 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
         <>
           <Keyword>constructor</Keyword>(
           <Parameters parameters={t.parameters} />){" {"}
-          {t.body && <Tree tree={t.body} />}
+          {t.body && (
+            <IndentBlock>
+              <Tree tree={t.body} />
+            </IndentBlock>
+          )}
           {"}"}
         </>
       );
@@ -1011,7 +1030,6 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
           {t.heritageClauses && (
             <>
               {t.heritageClauses.map((h, idx) => {
-                const last: boolean = idx === t.heritageClauses!.length - 1;
                 return (
                   <span key={idx}>
                     <Tree tree={h} />
@@ -1056,7 +1074,11 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
             <Parameters parameters={t.parameters} />
           </IndentBlock>
           ) {"{"}
-          {t.body && <Tree tree={t.body} />}
+          {t.body && (
+            <IndentBlock>
+              <Tree tree={t.body} />
+            </IndentBlock>
+          )}
           {"}"}
         </div>
       );
@@ -1142,9 +1164,11 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
                       {isBlock ? (
                         <>
                           &nbsp;{"{"}
-                          {c.statements.map((stmt, idx) => {
-                            return <Tree tree={stmt} key={idx} />;
-                          })}
+                          <IndentBlock>
+                            {c.statements.map((stmt, idx) => {
+                              return <Tree tree={stmt} key={idx} />;
+                            })}
+                          </IndentBlock>
                           {"}"}
                         </>
                       ) : (
@@ -1231,7 +1255,7 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
     case ts.SyntaxKind.PropertySignature: {
       const t = (tree as unknown) as ts.PropertySignature;
       return (
-        <>
+        <div>
           {t.modifiers && <Modifiers modifiers={t.modifiers} />}
           <Tree tree={t.name} />
           {t.type && (
@@ -1246,7 +1270,8 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
               <Tree tree={t.initializer} />
             </>
           )}
-        </>
+          ;
+        </div>
       );
     }
     case ts.SyntaxKind.MethodSignature: {
@@ -1282,13 +1307,16 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
       return (
         <>
           {"{"}
-          {t.members.map((member, idx) => {
-            return (
-              <span key={idx}>
-                <Tree tree={member} />
-              </span>
-            );
-          })}
+          <IndentBlock>
+            {t.members.map((member, idx) => {
+              return (
+                <span key={idx}>
+                  <Tree tree={member} />
+                </span>
+              );
+            })}
+          </IndentBlock>
+
           {"}"}
         </>
       );

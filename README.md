@@ -4,11 +4,13 @@ Visual TypeScript Editing Environment.
 
 Edit code editor and visual editor each other.
 
+[demo](https://zealous-almeida-959860.netlify.app)
+
 ## Philosophy and Goal
 
 Today's no-code and low-code miss visual programming infastructure. All visual programming environments have turing complete semantics, after all.
 
-So as first step of visual programming, we need ast editor and generate both code and UI from it.
+So as first step of visual programming, we need ast editor and generate both code and UI from its tree.
 
 TypeScript is best choice for general purpose like web(ui) and backend(node.js).
 
