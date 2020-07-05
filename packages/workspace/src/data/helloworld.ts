@@ -10,3 +10,7 @@ export default function main(a: string, num: number) {
   console.log("hello", a, num, multilineText);
 }
 main("xxx", 5);
+
+if (Math.random() > 0.5) {
+  alert("hello");
+}

@@ -282,6 +282,20 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
     case ts.SyntaxKind.EqualsToken: {
       return <span>=</span>;
     }
+    case ts.SyntaxKind.GreaterThanToken: {
+      return <span>{">"}</span>;
+    }
+    case ts.SyntaxKind.GreaterThanEqualsToken: {
+      return <span>{">="}</span>;
+    }
+    case ts.SyntaxKind.LessThanToken:
+    case ts.SyntaxKind.FirstBinaryOperator: {
+      return <span>{"<"}</span>;
+    }
+    case ts.SyntaxKind.LessThanEqualsToken: {
+      return <span>{"<="}</span>;
+    }
+
     case ts.SyntaxKind.EqualsEqualsToken: {
       return <span>{"=="}</span>;
     }
@@ -631,9 +645,11 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
       return (
         <span>
           <Tree tree={t.expression} />(
-          <IndentBlock>
-            <Arguments arguments={t.arguments} />
-          </IndentBlock>
+          {t.arguments.length > 0 && (
+            <IndentBlock>
+              <Arguments arguments={t.arguments} />
+            </IndentBlock>
+          )}
           )
           {t.typeArguments && (
             <>

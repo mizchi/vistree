@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import ts from "typescript";
 import styled from "styled-components";
 
@@ -34,6 +34,16 @@ function EditableRenderer({ tree }: { tree: ts.Node }) {
     //     />
     //   );
     // }
+    case ts.SyntaxKind.SourceFile:
+    case ts.SyntaxKind.Block: {
+      return (
+        <EditableBlock
+          block={tree as ts.Block}
+          onChangeNode={context.onChangeNode}
+        />
+      );
+    }
+
     case ts.SyntaxKind.StringLiteral: {
       return (
         <EditableStringLiteral
@@ -260,6 +270,70 @@ function EditableBooleanLiteral({
   );
 }
 
+function EditableBlock({
+  block,
+  onChangeNode,
+}: {
+  block: ts.Block | ts.SourceFile;
+  onChangeNode: (
+    prev: ts.Block | ts.SourceFile,
+    next: ts.Block | ts.SourceFile
+  ) => void;
+}) {
+  const [appending, setAppending] = useState("");
+  const addStatement = useCallback(
+    function addStatement(ev: Event) {
+      ev.preventDefault();
+      if (appending.length > 0) {
+        const ret = ts.createSourceFile(
+          "file:///__expr__.ts",
+          appending,
+          ts.ScriptTarget.Latest,
+          /*setParentNodes*/ false,
+          ts.ScriptKind.TSX
+        );
+        const newStmts = block.statements.concat(ret.statements);
+        if (block.kind === ts.SyntaxKind.Block) {
+          onChangeNode(block, ts.createBlock(newStmts));
+        }
+        // How I add statements to source?
+        // else if (block.kind === ts.SyntaxKind.SourceFile) {
+        // }
+        setAppending("");
+      }
+    },
+    [appending]
+  );
+
+  return (
+    <>
+      <CodeRenderer tree={block} />
+      {block.kind === ts.SyntaxKind.Block && (
+        <div style={{ display: "flex", width: "100%" }}>
+          <div style={{ flex: 1, height: "18px" }}>
+            <Textarea
+              value={appending}
+              style={{ width: "100%", height: 26 }}
+              onChange={(ev) => {
+                const value = ev.target.value;
+                setAppending(value);
+              }}
+              onKeyDown={(ev: any) => {
+                if (ev.key === "Enter") {
+                  addStatement(ev);
+                }
+              }}
+            />
+          </div>
+          <div>
+            <button onClick={addStatement as any}>Enter</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 const Input = styled.input.attrs({
   autoComplete: "off",
   spellcheck: "false",
@@ -273,7 +347,7 @@ const Input = styled.input.attrs({
   font-size: ${fontSize}px;
   box-sizing: border-box;
   /* outline: 1px solid #ccc; */
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid yellow;
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
     monospace;
 `;
@@ -286,8 +360,9 @@ const Textarea = styled.textarea.attrs({
   background: #222;
   color: #eee;
   box-sizing: border-box;
-  border: 1px dashed white;
-  outline: 1px solid black;
+  border: 1px dashed yellow;
+  /* outline: 1px solid black; */
+  outline: none;
   min-width: 0.5em;
   padding: ${padding}px;
   font-size: ${fontSize}px;
