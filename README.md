@@ -103,6 +103,7 @@ function Renderer({ tree }: { tree: ts.Node }) {
 - [x] ArrayBindingPattern `const {} = {}`
 - [x] `foo!`
 - [x] monorepo
+- [ ] while
 
 ## Icebox
 

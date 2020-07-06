@@ -1671,6 +1671,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-monaco-editor@^0.16.0":
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/@types/react-monaco-editor/-/react-monaco-editor-0.16.0.tgz#12913ab07221f3335eb56d12d38b9d310643db2f"
+  integrity sha512-3YxNIyZ+mlU6WN9UfQ/T66LYjHH3ZWOK4csfefkkXdDmUbHDbuDpfmVSYyJt1W0wlwhcfu4zc7BMwYrimN/GUg==
+  dependencies:
+    react-monaco-editor "*"
+
 "@types/react-native@*":
   version "0.62.14"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.62.14.tgz#13ce7dab136bb124b6f394fe7510442557b16d29"
@@ -1695,7 +1702,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^16.9.41":
+"@types/react@*", "@types/react@^16.9.41", "@types/react@^16.x":
   version "16.9.41"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.9.41.tgz#925137ee4d2ff406a0ecf29e8e9237390844002e"
   integrity sha512-6cFei7F7L4wwuM+IND/Q2cV1koQUvJ8iSV+Gwn0c3kvABZ691g7sp3hfEQHOUBJtccl1gPi+EyNjMIl9nGA0ug==
@@ -7811,7 +7818,7 @@ monaco-editor-webpack-plugin@^1.9.0:
   dependencies:
     loader-utils "^1.2.3"
 
-monaco-editor@^0.20.0:
+monaco-editor@*, monaco-editor@^0.20.0:
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.20.0.tgz#5d5009343a550124426cb4d965a4d27a348b4dea"
   integrity sha512-hkvf4EtPJRMQlPC3UbMoRs0vTAFAYdzFQ+gpMb8A+9znae1c43q8Mab9iVsgTcg/4PNiLGGn3SlDIa8uvK1FIQ==
@@ -9442,6 +9449,15 @@ react-is@^16.7.0, react-is@^16.8.0, react-is@^16.8.1, react-is@^16.8.4, react-is
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
+
+react-monaco-editor@*, react-monaco-editor@^0.36.0:
+  version "0.36.0"
+  resolved "https://registry.yarnpkg.com/react-monaco-editor/-/react-monaco-editor-0.36.0.tgz#ac085c14f25fb072514c925596f6a06a711ee078"
+  integrity sha512-JVA5SZhOoYZ0DCdTwYgagtRb3jHo4KN7TVFiJauG+ZBAJWfDSTzavPIrwzWbgu8ahhDqDk4jUcYlOJL2BC/0UA==
+  dependencies:
+    "@types/react" "^16.x"
+    monaco-editor "*"
+    prop-types "^15.7.2"
 
 react-redux@^7.2.0:
   version "7.2.0"

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import ts from "typescript";
+import ts, { IfStatement } from "typescript";
 import styled from "styled-components";
 
 export type RendererTreeOptions<T = void> = {
@@ -37,19 +37,12 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
       return (
         <>
           {t.statements.map((stmt, idx) => (
-            <Tree tree={stmt} key={idx} />
+            <div key={idx}>
+              <Tree tree={stmt} />
+            </div>
           ))}
         </>
       );
-      // const childrenNodes: React.ReactNode[] = [];
-      // let key = 0;
-      // ts.forEachChild(tree, (child: ts.Node) => {
-      //   if (child.kind === ts.SyntaxKind.EndOfFileToken) {
-      //     return;
-      //   }
-      //   childrenNodes.push(<Tree tree={child} key={key++} />);
-      // });
-      // return <IndentBlock>{childrenNodes}</IndentBlock>;
     }
     // Misc
     case ts.SyntaxKind.EndOfFileToken: {
@@ -1118,10 +1111,10 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
       );
     }
     case ts.SyntaxKind.IfStatement: {
-      // TODO: Else if
       const t = tree as ts.IfStatement;
+      // inline span for else if
       return (
-        <div>
+        <div style={{ display: true ? "inline" : "block" }}>
           <Keyword>if</Keyword> (
           <Tree tree={t.expression} />) {"{"}
           <IndentBlock>
@@ -1132,11 +1125,17 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
               {"}"}&nbsp;
               <Keyword>else</Keyword>
               &nbsp;
-              {"{"}
-              <IndentBlock>
+              {t.elseStatement.kind === ts.SyntaxKind.IfStatement ? (
                 <Tree tree={t.elseStatement} />
-              </IndentBlock>
-              {"}"}
+              ) : (
+                <>
+                  {"{"}
+                  <IndentBlock>
+                    <Tree tree={t.elseStatement} />
+                  </IndentBlock>
+                  {"}"}
+                </>
+              )}
             </div>
           ) : (
             <>{"}"}</>

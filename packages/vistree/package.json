@@ -13,6 +13,7 @@
     "styled-components": "*"
   },
   "files": [
-    "lib"
+    "lib",
+    "src"
   ]
 }

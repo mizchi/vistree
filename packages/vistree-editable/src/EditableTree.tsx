@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import ts from "typescript";
 import styled from "styled-components";
+import MonacoEditor from "react-monaco-editor";
 
 import {
   VisualTree,
@@ -283,7 +284,7 @@ function EditableBlock({
   const [showGuide, setShowGuide] = useState(false);
 
   const [appending, setAppending] = useState("");
-  const addStatement = useCallback(
+  const appendCode = useCallback(
     (code: string) => {
       if (code.length > 0) {
         const ret = ts.createSourceFile(
@@ -312,8 +313,32 @@ function EditableBlock({
       {block.kind === ts.SyntaxKind.Block && (
         <div>
           <div style={{ display: "flex", width: "100%" }}>
-            <div style={{ flex: 1, height: "18px" }}>
-              <Textarea
+            <div style={{ flex: 1, height: 26 * 2 }}>
+              <MonacoEditor
+                // width="800"
+                // height="600"
+                language="typescript"
+                theme="vs-dark"
+                value={appending}
+                options={{
+                  lineNumbers: "off",
+                  minimap: { enabled: false },
+                  fontSize: 18,
+                  glyphMargin: false,
+                }}
+                onChange={(value) => {
+                  setAppending(value);
+                  // TODO: Resize Editor
+                }}
+                editorDidMount={(editor) => {
+                  editor.layout();
+                  const m = editor.getModel();
+                  m?.updateOptions({ tabSize: 2 });
+                  console.log("mounted");
+                }}
+              />
+
+              {/* <Textarea
                 value={appending}
                 style={{ width: "100%", height: 26 }}
                 onFocus={() => setShowGuide(true)}
@@ -328,12 +353,12 @@ function EditableBlock({
                     // @ts-ignore
                     ev.target.blur?.();
 
-                    addStatement(appending);
+                    appendCode(appending);
                     setAppending("");
                     setShowGuide(false);
                   }
                 }}
-              />
+              /> */}
             </div>
             <div>
               <button
@@ -341,7 +366,7 @@ function EditableBlock({
                   ev.preventDefault();
                   // @ts-ignore
                   ev.target.blur?.();
-                  addStatement(appending);
+                  appendCode(appending);
                   setAppending("");
                   setShowGuide(false);
                 }}
@@ -354,14 +379,14 @@ function EditableBlock({
             <div>
               <button
                 onClick={(ev) => {
-                  addStatement("for(const i of []) {}");
+                  appendCode("for(const i of []) {}");
                 }}
               >
                 for of
               </button>
               <button
                 onClick={(ev) => {
-                  addStatement("if(true) {}");
+                  appendCode("if(true) {}");
                 }}
               >
                 if
@@ -369,7 +394,7 @@ function EditableBlock({
 
               <button
                 onClick={(ev) => {
-                  addStatement("if(true) {} else {}");
+                  appendCode("if(true) {} else {}");
                 }}
               >
                 if else
