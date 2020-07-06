@@ -280,14 +280,15 @@ function EditableBlock({
     next: ts.Block | ts.SourceFile
   ) => void;
 }) {
+  const [showGuide, setShowGuide] = useState(false);
+
   const [appending, setAppending] = useState("");
   const addStatement = useCallback(
-    function addStatement(ev: Event) {
-      ev.preventDefault();
-      if (appending.length > 0) {
+    (code: string) => {
+      if (code.length > 0) {
         const ret = ts.createSourceFile(
           "file:///__expr__.ts",
-          appending,
+          code,
           ts.ScriptTarget.Latest,
           /*setParentNodes*/ false,
           ts.ScriptKind.TSX
@@ -302,32 +303,79 @@ function EditableBlock({
         setAppending("");
       }
     },
-    [appending]
+    [appending, block]
   );
 
   return (
     <>
       <CodeRenderer tree={block} />
       {block.kind === ts.SyntaxKind.Block && (
-        <div style={{ display: "flex", width: "100%" }}>
-          <div style={{ flex: 1, height: "18px" }}>
-            <Textarea
-              value={appending}
-              style={{ width: "100%", height: 26 }}
-              onChange={(ev) => {
-                const value = ev.target.value;
-                setAppending(value);
-              }}
-              onKeyDown={(ev: any) => {
-                if (ev.key === "Enter") {
-                  addStatement(ev);
-                }
-              }}
-            />
+        <div>
+          <div style={{ display: "flex", width: "100%" }}>
+            <div style={{ flex: 1, height: "18px" }}>
+              <Textarea
+                value={appending}
+                style={{ width: "100%", height: 26 }}
+                onFocus={() => setShowGuide(true)}
+                // onBlur={() => setShowGuide(false)}
+                onChange={(ev) => {
+                  const value = ev.target.value;
+                  setAppending(value);
+                }}
+                onKeyDown={(ev) => {
+                  if (ev.key === "Enter") {
+                    ev.preventDefault();
+                    // @ts-ignore
+                    ev.target.blur?.();
+
+                    addStatement(appending);
+                    setAppending("");
+                    setShowGuide(false);
+                  }
+                }}
+              />
+            </div>
+            <div>
+              <button
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  // @ts-ignore
+                  ev.target.blur?.();
+                  addStatement(appending);
+                  setAppending("");
+                  setShowGuide(false);
+                }}
+              >
+                Enter
+              </button>
+            </div>
           </div>
-          <div>
-            <button onClick={addStatement as any}>Enter</button>
-          </div>
+          {showGuide && (
+            <div>
+              <button
+                onClick={(ev) => {
+                  addStatement("for(const i of []) {}");
+                }}
+              >
+                for of
+              </button>
+              <button
+                onClick={(ev) => {
+                  addStatement("if(true) {}");
+                }}
+              >
+                if
+              </button>
+
+              <button
+                onClick={(ev) => {
+                  addStatement("if(true) {} else {}");
+                }}
+              >
+                if else
+              </button>
+            </div>
+          )}
         </div>
       )}
     </>

@@ -1110,7 +1110,9 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
           &nbsp;of&nbsp;
           <Tree tree={t.expression} />
           )&nbsp;{"{"}
-          <Tree tree={t.statement} />
+          <IndentBlock>
+            <Tree tree={t.statement} />
+          </IndentBlock>
           {"}"}
         </div>
       );
