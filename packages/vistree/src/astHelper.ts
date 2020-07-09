@@ -13,6 +13,13 @@ export function parseCode(value: string) {
   return ret;
 }
 
+export function updateSource(
+  ast: ts.SourceFile,
+  newStatements: ts.Statement[]
+) {
+  return ts.updateSourceFileNode(ast, newStatements);
+}
+
 export function replaceNode(ast: ts.SourceFile, prev: ts.Node, next: ts.Node) {
   function rewriter(): ts.TransformerFactory<ts.Node> {
     return (context) => {
@@ -23,6 +30,7 @@ export function replaceNode(ast: ts.SourceFile, prev: ts.Node, next: ts.Node) {
       return (node) => ts.visitNode(node, visit);
     };
   }
+  ts.updateSourceFileNode;
   const result = ts.transform(ast, [rewriter()]);
   const newAst = result.transformed[0] as ts.SourceFile;
   return newAst;

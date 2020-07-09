@@ -10,19 +10,25 @@ import {
   Keyword,
   IndentBlock,
 } from "@mizchi/vistree/src";
-import { replaceNode } from "@mizchi/vistree/src/astHelper";
 
-type EditableContext = { onChangeNode: (prev: ts.Node, next: ts.Node) => void };
+type EditableContext = {
+  onChangeNode: (prev: ts.Node, next: ts.Node) => void;
+  onUpdateSource: (newStatements: ts.Statement[]) => void;
+};
 
 export function EditableTree(props: {
   ast: ts.SourceFile;
   onChangeNode: (prev: ts.Node, next: ts.Node) => void;
+  onUpdateSource: (statements: ts.Statement[]) => void;
 }) {
   return (
     <VisualTree
       renderer={EditableRenderer}
       root={props.ast}
-      context={{ onChangeNode: props.onChangeNode }}
+      context={{
+        onChangeNode: props.onChangeNode,
+        onUpdateSource: props.onUpdateSource,
+      }}
     />
   );
 }
@@ -38,7 +44,9 @@ function EditableRenderer({ tree }: { tree: ts.Node }) {
     //     />
     //   );
     // }
-    case ts.SyntaxKind.SourceFile:
+    case ts.SyntaxKind.SourceFile: {
+      return <EditableSourceFile sourceFile={tree as ts.SourceFile} />;
+    }
     case ts.SyntaxKind.Block: {
       return (
         <EditableBlock
@@ -314,20 +322,53 @@ function EditableBooleanLiteral({
   );
 }
 
+function EditableSourceFile({ sourceFile }: { sourceFile: ts.SourceFile }) {
+  const { context, renderer: Renderer } = useRendererContext<EditableContext>();
+  return (
+    <>
+      {sourceFile.statements.map((stmt, key) => {
+        return <Renderer tree={stmt} key={key} />;
+      })}
+      <AppendStatementsToolbar
+        onAppend={(stmts) => {
+          const newStmts = sourceFile.statements.concat(stmts);
+          context.onUpdateSource(newStmts);
+        }}
+      />
+    </>
+  );
+}
+
 function EditableBlock({
   block,
   onChangeNode,
 }: {
-  block: ts.Block | ts.SourceFile;
-  onChangeNode: (
-    prev: ts.Block | ts.SourceFile,
-    next: ts.Block | ts.SourceFile
-  ) => void;
+  block: ts.Block;
+  onChangeNode: (prev: ts.Block, next: ts.Block) => void;
 }) {
-  const [showGuide, setShowGuide] = useState(false);
+  const { renderer: Renderer } = useRendererContext<EditableContext>();
+  return (
+    <>
+      {block.statements.map((stmt, key) => {
+        return <Renderer tree={stmt} key={key} />;
+      })}
+      <AppendStatementsToolbar
+        onAppend={(stmts) => {
+          const newStmts = block.statements.concat(stmts);
+          onChangeNode(block, ts.createBlock(newStmts));
+        }}
+      />
+    </>
+  );
+}
 
+function AppendStatementsToolbar({
+  onAppend,
+}: {
+  onAppend: (newStatements: ts.NodeArray<ts.Statement>) => void;
+}) {
   const [appending, setAppending] = useState("");
-  const appendCode = useCallback(
+  const append = useCallback(
     (code: string) => {
       if (code.length > 0) {
         const ret = ts.createSourceFile(
@@ -337,116 +378,45 @@ function EditableBlock({
           /*setParentNodes*/ false,
           ts.ScriptKind.TSX
         );
-        const newStmts = block.statements.concat(ret.statements);
-        if (block.kind === ts.SyntaxKind.Block) {
-          onChangeNode(block, ts.createBlock(newStmts));
-        }
-        // How I add statements to source?
-        // else if (block.kind === ts.SyntaxKind.SourceFile) {
-        // }
+        onAppend(ret.statements);
         setAppending("");
       }
     },
-    [appending, block]
+    [appending, onAppend]
   );
-
   return (
-    <>
-      <CodeRenderer tree={block} />
-      {block.kind === ts.SyntaxKind.Block && (
-        <div>
-          <div style={{ display: "flex", width: "100%" }}>
-            <div style={{ flex: 1, height: 26 * 2 }}>
-              <MonacoEditor
-                // width="800"
-                // height="600"
-                language="typescript"
-                theme="vs-dark"
-                value={appending}
-                options={{
-                  lineNumbers: "off",
-                  minimap: { enabled: false },
-                  fontSize: 18,
-                  glyphMargin: false,
-                }}
-                onChange={(value) => {
-                  setAppending(value);
-                  // TODO: Resize Editor
-                }}
-                editorDidMount={(editor) => {
-                  editor.layout();
-                  const m = editor.getModel();
-                  m?.updateOptions({ tabSize: 2 });
-                  console.log("mounted");
-                }}
-              />
-
-              {/* <Textarea
-                value={appending}
-                style={{ width: "100%", height: 26 }}
-                onFocus={() => setShowGuide(true)}
-                // onBlur={() => setShowGuide(false)}
-                onChange={(ev) => {
-                  const value = ev.target.value;
-                  setAppending(value);
-                }}
-                onKeyDown={(ev) => {
-                  if (ev.key === "Enter") {
-                    ev.preventDefault();
-                    // @ts-ignore
-                    ev.target.blur?.();
-
-                    appendCode(appending);
-                    setAppending("");
-                    setShowGuide(false);
-                  }
-                }}
-              /> */}
-            </div>
-            <div>
-              <button
-                onClick={(ev) => {
-                  ev.preventDefault();
-                  // @ts-ignore
-                  ev.target.blur?.();
-                  appendCode(appending);
-                  setAppending("");
-                  setShowGuide(false);
-                }}
-              >
-                Enter
-              </button>
-            </div>
-          </div>
-          {showGuide && (
-            <div>
-              <button
-                onClick={(ev) => {
-                  appendCode("for(const i of []) {}");
-                }}
-              >
-                for of
-              </button>
-              <button
-                onClick={(ev) => {
-                  appendCode("if(true) {}");
-                }}
-              >
-                if
-              </button>
-
-              <button
-                onClick={(ev) => {
-                  appendCode("if(true) {} else {}");
-                }}
-              >
-                if else
-              </button>
-            </div>
-          )}
+    <div>
+      <div style={{ display: "flex", width: "100%" }}>
+        <div style={{ flex: 1, height: 26 }}>
+          <Textarea
+            value={appending}
+            style={{ width: "100%", height: 26 }}
+            onChange={(ev) => {
+              const value = ev.target.value;
+              setAppending(value);
+            }}
+            onKeyDown={(ev) => {
+              if (ev.key === "Enter") {
+                ev.preventDefault();
+                append(appending);
+              }
+            }}
+          />
         </div>
-      )}
-    </>
+        <div>
+          <button
+            onClick={(ev) => {
+              ev.preventDefault();
+              // @ts-ignore
+              ev.target.blur?.();
+              append(appending);
+            }}
+          >
+            Enter
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -569,3 +539,29 @@ const Textarea = styled.textarea.attrs({
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
     monospace;
 `;
+
+{
+  /* <MonacoEditor
+                // width="800"
+                // height="600"
+                language="typescript"
+                theme="vs-dark"
+                value={appending}
+                options={{
+                  lineNumbers: "off",
+                  minimap: { enabled: false },
+                  fontSize: 18,
+                  glyphMargin: false,
+                }}
+                onChange={(value) => {
+                  setAppending(value);
+                  // TODO: Resize Editor
+                }}
+                editorDidMount={(editor) => {
+                  editor.layout();
+                  const m = editor.getModel();
+                  m?.updateOptions({ tabSize: 2 });
+                  console.log("mounted");
+                }}
+              /> */
+}

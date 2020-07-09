@@ -31,8 +31,19 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
   const { renderer: Tree } = useContext(RendererContext);
   switch (tree.kind) {
     // Root
-    case ts.SyntaxKind.Block:
     case ts.SyntaxKind.SourceFile: {
+      const t = tree as ts.SourceFile;
+      return (
+        <>
+          {t.statements.map((stmt, idx) => (
+            <div key={idx}>
+              <Tree tree={stmt} />
+            </div>
+          ))}
+        </>
+      );
+    }
+    case ts.SyntaxKind.Block: {
       const t = tree as ts.Block;
       return (
         <>

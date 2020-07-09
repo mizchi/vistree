@@ -6,7 +6,7 @@ import { format } from "../worker/prettier.worker";
 import { Scrollable, HeaderContainer, Root, ContentContainer } from "./layout";
 import { TEMPLATES } from "../data";
 // import { Button } from "@material-ui/core";
-import { parseCode, rewriteSource } from "@mizchi/vistree/src";
+import { parseCode, replaceNode, updateSource } from "@mizchi/vistree/src";
 import { VisualEditableTree } from "@mizchi/vistree-editable/src";
 
 const MonacoEditor = React.lazy(() => import("./MonacoEditor"));
@@ -34,22 +34,33 @@ export function App() {
     setEditor(ed);
   }, []);
 
-  const onChangeCode = useCallback((value: string) => {
-    if (mode === EditMode.CodeAndVisual) {
-      const ast = parseCode(value);
-      setAst(ast);
-    }
+  const onChangeCode = useCallback((newCode: string) => {
+    // if (mode === EditMode.CodeAndVisual) {
+    const ast = parseCode(newCode);
+    setAst(ast);
+    // }
   }, []);
+
+  const onUpdateSource = useCallback(
+    async (newStatements: ts.Statement[]) => {
+      const newAst = updateSource(ast, newStatements);
+      setAst(newAst);
+
+      const newCode = await printCodeWithFormat(newAst);
+      setCode(newCode);
+      setCheckpointCode(newCode);
+    },
+    [ast, mode]
+  );
 
   const onChangeNode = useCallback(
     async (prev: ts.Node, next: ts.Node) => {
-      const newAst = rewriteSource(ast, prev, next);
+      const newAst = replaceNode(ast, prev, next);
       setAst(newAst);
-      if (mode === EditMode.CodeAndVisual) {
-        const newCode = await printCodeWithFormat(newAst);
-        setCode(newCode);
-        setCheckpointCode(newCode);
-      }
+
+      const newCode = await printCodeWithFormat(newAst);
+      setCode(newCode);
+      setCheckpointCode(newCode);
     },
     [ast, mode]
   );
@@ -121,7 +132,11 @@ export function App() {
             >
               <Scrollable>
                 <div style={{ padding: 3 }}>
-                  <VisualEditableTree ast={ast} onChangeNode={onChangeNode} />
+                  <VisualEditableTree
+                    ast={ast}
+                    onChangeNode={onChangeNode}
+                    onUpdateSource={onUpdateSource}
+                  />
                 </div>
               </Scrollable>
             </div>
