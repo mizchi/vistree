@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, Context } from "react";
 import ts from "typescript";
 import styled from "styled-components";
 import MonacoEditor from "react-monaco-editor";
@@ -7,7 +7,10 @@ import {
   VisualTree,
   CodeRenderer,
   useRendererContext,
+  Keyword,
+  IndentBlock,
 } from "@mizchi/vistree/src";
+import { replaceNode } from "@mizchi/vistree/src/astHelper";
 
 type EditableContext = { onChangeNode: (prev: ts.Node, next: ts.Node) => void };
 
@@ -25,7 +28,7 @@ export function EditableTree(props: {
 }
 
 function EditableRenderer({ tree }: { tree: ts.Node }) {
-  const { context } = useRendererContext<EditableContext>();
+  const { renderer: Tree, context } = useRendererContext<EditableContext>();
   switch (tree.kind) {
     // case ts.SyntaxKind.Identifier: {
     //   return (
@@ -42,6 +45,46 @@ function EditableRenderer({ tree }: { tree: ts.Node }) {
           block={tree as ts.Block}
           onChangeNode={context.onChangeNode}
         />
+      );
+    }
+
+    case ts.SyntaxKind.IfStatement: {
+      const t = tree as ts.IfStatement;
+      // inline span for else if
+      return (
+        <div style={{ display: true ? "inline" : "block" }}>
+          <Keyword>if</Keyword>
+          {"("}
+          <IndentBlock>
+            <BooleanExpectedNode tree={t.expression} />
+          </IndentBlock>
+          {")"}
+          &nbsp;
+          {"{"}
+          <IndentBlock>
+            <Tree tree={t.thenStatement} />
+          </IndentBlock>
+          {t.elseStatement ? (
+            <div>
+              {"}"}&nbsp;
+              <Keyword>else</Keyword>
+              &nbsp;
+              {t.elseStatement.kind === ts.SyntaxKind.IfStatement ? (
+                <Tree tree={t.elseStatement} />
+              ) : (
+                <>
+                  {"{"}
+                  <IndentBlock>
+                    <Tree tree={t.elseStatement} />
+                  </IndentBlock>
+                  {"}"}
+                </>
+              )}
+            </div>
+          ) : (
+            <>{"}"}</>
+          )}
+        </div>
       );
     }
 
@@ -406,6 +449,87 @@ function EditableBlock({
     </>
   );
 }
+
+enum BooleanExpectedNodeType {
+  BinaryExpression = "binary-expression",
+  Boolean = "boolean",
+  Expression = "expression",
+}
+
+function getCurrentBooleanExpectedType(
+  kind: ts.SyntaxKind
+): BooleanExpectedNodeType {
+  switch (kind) {
+    case ts.SyntaxKind.BinaryExpression: {
+      return BooleanExpectedNodeType.BinaryExpression;
+    }
+    case ts.SyntaxKind.FalseKeyword:
+    case ts.SyntaxKind.TrueKeyword: {
+      return BooleanExpectedNodeType.Boolean;
+    }
+    default: {
+      return BooleanExpectedNodeType.Expression;
+    }
+  }
+}
+
+function BooleanExpectedNode({ tree }: { tree: ts.Expression }) {
+  const { renderer: Tree, context } = useRendererContext<EditableContext>();
+  const nodeType = getCurrentBooleanExpectedType(tree.kind);
+
+  // const [nodeType, setNodeType] = useState<BooleanExpectedNodeType>(
+  //   getCurrentBooleanExpectedType(tree.kind)
+  // );
+  const onChangeKind = useCallback(
+    (ev) => {
+      console.log(ev.target.value);
+      const newNodeType = ev.target.value as BooleanExpectedNodeType;
+      // setNodeType(ev.target.value as BooleanExpectedNodeType);
+      switch (newNodeType) {
+        case BooleanExpectedNodeType.Boolean: {
+          return context.onChangeNode(tree, ts.createTrue());
+        }
+        case BooleanExpectedNodeType.BinaryExpression: {
+          return context.onChangeNode(
+            tree,
+            ts.createBinary(
+              ts.createNumericLiteral(1),
+              ts.SyntaxKind.GreaterThanToken,
+              ts.createNumericLiteral(0)
+            )
+          );
+        }
+      }
+      // replaceNode(root, tree,  ts. )
+    },
+    [nodeType, tree]
+  );
+
+  return (
+    <div style={{ outline: "1px solid yellow", width: "100%" }}>
+      <div>
+        {"/* "}
+        <select value={nodeType} onChange={onChangeKind}>
+          {[
+            BooleanExpectedNodeType.BinaryExpression,
+            BooleanExpectedNodeType.Boolean,
+            BooleanExpectedNodeType.Expression,
+          ].map((nodeType) => {
+            return (
+              <option key={nodeType} value={nodeType}>
+                {nodeType}
+              </option>
+            );
+          })}
+        </select>
+        {" */"}
+      </div>
+      <Tree tree={tree} />
+    </div>
+  );
+}
+
+function CommentBlock() {}
 
 const Input = styled.input.attrs({
   autoComplete: "off",

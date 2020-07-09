@@ -1,2 +1,9 @@
-export { VisualTree, CodeRenderer, useRendererContext } from "./VisualTree";
-export { parseCode, rewriteSource } from "./astHelper";
+export {
+  VisualTree,
+  CodeRenderer,
+  useRendererContext,
+  IndentBlock,
+  Keyword,
+  Literal,
+} from "./VisualTree";
+export { parseCode, replaceNode as rewriteSource } from "./astHelper";

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import ts, { IfStatement } from "typescript";
+import ts from "typescript";
 import styled from "styled-components";
 
 export type RendererTreeOptions<T = void> = {
@@ -1462,15 +1462,15 @@ function Parameters(props: {
   );
 }
 
-const Keyword = styled.span`
+export const Keyword = styled.span`
   color: #569cd6;
 `;
 
-const Literal = styled.span`
+export const Literal = styled.span`
   color: rgb(181, 206, 168);
 `;
 
-function IndentBlock(props: { children: any }) {
+export function IndentBlock(props: { children: any }) {
   return <div style={{ paddingLeft: "1rem" }}>{props.children}</div>;
 }
 
