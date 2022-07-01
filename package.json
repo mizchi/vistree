@@ -3,7 +3,8 @@
   "license": "MIT",
   "packageManager": "pnpm@7.4.0",
   "scripts": {
-    "dev": "vite dev"
+    "dev": "vite dev",
+    "publish": "wrangler pages publish ./dist --commit-dirty"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "^1.4.0",
