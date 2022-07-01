@@ -16,22 +16,22 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
 
 const importMap = {
   imports: {
-    react: "https://cdn.jsdelivr.net/npm/react@16.9.0/index.js",
-    "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.9.0/index.js",
+    react: "https://cdn.jsdelivr.net/npm/react@18.2.0/index.js",
+    "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@18.2.0/index.js",
     typescript:
-      "https://cdn.jsdelivr.net/npm/typescript@4.0.0-dev.20200628/lib/typescript.js",
+      "https://cdn.jsdelivr.net/npm/typescript@4.7.4/lib/typescript.js",
   },
   types: {
     react: {
       "index.d.ts":
-        "https://cdn.jsdelivr.net/npm/@types/react@16.9.0/index.d.ts",
+        "https://cdn.jsdelivr.net/npm/@types/react@18.2.0/index.d.ts",
       "global.d.ts":
-        "https://cdn.jsdelivr.net/npm/@types/react@16.9.0/global.d.ts",
+        "https://cdn.jsdelivr.net/npm/@types/react@18.2.0/global.d.ts",
     },
     "react-dom":
-      "https://cdn.jsdelivr.net/npm/@types/react-dom@16.9.0/index.d.ts",
+      "https://cdn.jsdelivr.net/npm/@types/react-dom@18.2.0/index.d.ts",
     typescript:
-      "https://cdn.jsdelivr.net/npm/typescript@4.0.0-dev.20200628/lib/typescript.d.ts",
+      "https://cdn.jsdelivr.net/npm/typescript@4.7.4/lib/typescript.d.ts",
   },
 };
 
@@ -94,7 +94,7 @@ export default React.memo(function MonacoEditor(props: {
         },
       });
       editor.addCommand(
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
         async () => {
           editor.getAction("editor.action.formatDocument").run();
         }
