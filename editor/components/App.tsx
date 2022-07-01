@@ -5,8 +5,8 @@ import { astToCode } from "../worker/typescript.worker";
 import { format } from "../worker/prettier.worker";
 import { Scrollable, HeaderContainer, Root, ContentContainer } from "./layout";
 import { TEMPLATES } from "../data";
-import { parseCode, replaceNode, updateSource } from "@mizchi/vistree/src/index";
-import { VisualEditableTree } from "@mizchi/vistree-editable/src/index";
+import { parseCode, replaceNode, updateSource } from "../../ast/typescript";
+import { EditableTree } from "../../vistree/EditableTree";
 
 const MonacoEditor = React.lazy(() => import("./MonacoEditor"));
 
@@ -131,7 +131,7 @@ export function App() {
             >
               <Scrollable>
                 <div style={{ padding: 3 }}>
-                  <VisualEditableTree
+                  <EditableTree
                     ast={ast}
                     onChangeNode={onChangeNode}
                     onUpdateSource={onUpdateSource}

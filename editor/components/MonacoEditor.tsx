@@ -16,22 +16,22 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
 
 const importMap = {
   imports: {
-    react: "https://cdn.jsdelivr.net/npm/react@18.2.0/index.js",
-    "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@18.2.0/index.js",
+    react: "https://cdn.skypack.dev/react@18.2.0",
+    "react-dom": "https://cdn.skypack.dev/react-dom@18.2.0",
     typescript:
-      "https://cdn.jsdelivr.net/npm/typescript@4.7.4/lib/typescript.js",
+      "https://cdn.skypack.dev/typescript@4.7.4",
   },
   types: {
     react: {
       "index.d.ts":
-        "https://cdn.jsdelivr.net/npm/@types/react@18.2.0/index.d.ts",
+        "https://esm.sh/@types/react@18.0.0/index.d.ts",
       "global.d.ts":
-        "https://cdn.jsdelivr.net/npm/@types/react@18.2.0/global.d.ts",
+        "https://esm.sh/@types/react@18.0.0/global.d.ts",
     },
-    "react-dom":
-      "https://cdn.jsdelivr.net/npm/@types/react-dom@18.2.0/index.d.ts",
+    // "react-dom/client":
+    //   "https://esh.sh/@types/react-dom@18.0.0/client.d.ts",
     typescript:
-      "https://cdn.jsdelivr.net/npm/typescript@4.7.4/lib/typescript.d.ts",
+      "https://esm.sh/typescript@4.7.4/lib/typescript.d.ts",
   },
 };
 

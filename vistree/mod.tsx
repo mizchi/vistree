@@ -6,4 +6,4 @@ export {
   Keyword,
   Literal,
 } from "./VisualTree";
-export { parseCode, replaceNode, updateSource } from "./astHelper";
+export { parseCode, replaceNode, updateSource } from "../ast/typescript";

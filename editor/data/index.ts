@@ -1,4 +1,4 @@
-import tree from "@mizchi/vistree/src/VisualTree.tsx?raw";
+import tree from "../../vistree/VisualTree.tsx?raw";
 import helloworld from "./helloworld.ts?raw";
 
 export const TEMPLATES = {

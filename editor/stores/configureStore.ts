@@ -1,8 +1,7 @@
-import { replaceNode } from "@mizchi/vistree/src/index";
+import { replaceNode, parseCode } from "../../ast/typescript";
 import ts from "typescript";
 import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { TEMPLATES } from "../data";
-import { parseCode } from "@mizchi/vistree/src/index";
 
 enum EditMode {
   CodeAndVisual = "code-and-visual",

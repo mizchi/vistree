@@ -9,7 +9,7 @@ import {
   useRendererContext,
   Keyword,
   IndentBlock,
-} from "@mizchi/vistree/src/index";
+} from "./VisualTree";
 
 type EditableContext = {
   onChangeNode: (prev: ts.Node, next: ts.Node) => void;

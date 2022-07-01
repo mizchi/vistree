@@ -29,20 +29,19 @@ export function VisualTree<T>(props: RendererTreeOptions<T>) {
 
 export function CodeRenderer({ tree }: { tree: ts.Node }) {
   const { renderer: Tree } = useContext(RendererContext);
+  // TODO: Rewrite this format
+  if (ts.isSourceFile(tree)) {
+    return (
+      <>
+        {tree.statements.map((stmt, idx) => (
+          <div key={idx}>
+            <Tree tree={stmt} />
+          </div>
+        ))}
+      </>
+    );
+  }
   switch (tree.kind) {
-    // Root
-    case ts.SyntaxKind.SourceFile: {
-      const t = tree as ts.SourceFile;
-      return (
-        <>
-          {t.statements.map((stmt, idx) => (
-            <div key={idx}>
-              <Tree tree={stmt} />
-            </div>
-          ))}
-        </>
-      );
-    }
     case ts.SyntaxKind.Block: {
       const t = tree as ts.Block;
       return (
