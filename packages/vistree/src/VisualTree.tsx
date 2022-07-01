@@ -447,7 +447,7 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
     }
     case ts.SyntaxKind.PrefixUnaryExpression: {
       const t = tree as ts.PostfixUnaryExpression;
-      let token = {};
+      let token = '';
       if (t.operator === ts.SyntaxKind.PlusPlusToken) {
         token = "++";
       } else if (ts.SyntaxKind.MinusMinusToken) {
@@ -886,6 +886,7 @@ export function CodeRenderer({ tree }: { tree: ts.Node }) {
       const t = tree as ts.VariableDeclarationList;
       let declType;
       // TODO: Why 10?
+      // @ts-ignore
       if (t.flags === ts.NodeFlags.Const || t.flags === 10) declType = "const";
       else if (t.flags === ts.NodeFlags.Let) declType = "let";
       else declType = "var";

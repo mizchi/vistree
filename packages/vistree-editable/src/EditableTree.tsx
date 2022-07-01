@@ -9,7 +9,7 @@ import {
   useRendererContext,
   Keyword,
   IndentBlock,
-} from "@mizchi/vistree/src";
+} from "@mizchi/vistree/src/index";
 
 type EditableContext = {
   onChangeNode: (prev: ts.Node, next: ts.Node) => void;
@@ -451,7 +451,7 @@ function BooleanExpectedNode({ tree }: { tree: ts.Expression }) {
   //   getCurrentBooleanExpectedType(tree.kind)
   // );
   const onChangeKind = useCallback(
-    (ev) => {
+    (ev: any) => {
       console.log(ev.target.value);
       const newNodeType = ev.target.value as BooleanExpectedNodeType;
       // setNodeType(ev.target.value as BooleanExpectedNodeType);

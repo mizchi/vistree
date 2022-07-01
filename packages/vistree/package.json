@@ -9,11 +9,18 @@
     "build": "tsc -p ."
   },
   "peerDependencies": {
-    "typescript": "*",
-    "styled-components": "*"
+    "styled-components": "*",
+    "typescript": "*"
+  },
+  "type": "module",
+  "exports": {
+    "./*": "./*"
   },
   "files": [
     "lib",
     "src"
-  ]
+  ],
+  "devDependencies": {
+    "styled-components": "^5.3.5"
+  }
 }

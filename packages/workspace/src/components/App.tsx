@@ -5,9 +5,8 @@ import { astToCode } from "../worker/typescript.worker";
 import { format } from "../worker/prettier.worker";
 import { Scrollable, HeaderContainer, Root, ContentContainer } from "./layout";
 import { TEMPLATES } from "../data";
-// import { Button } from "@material-ui/core";
-import { parseCode, replaceNode, updateSource } from "@mizchi/vistree/src";
-import { VisualEditableTree } from "@mizchi/vistree-editable/src";
+import { parseCode, replaceNode, updateSource } from "@mizchi/vistree/src/index";
+import { VisualEditableTree } from "@mizchi/vistree-editable/src/index";
 
 const MonacoEditor = React.lazy(() => import("./MonacoEditor"));
 
@@ -30,7 +29,7 @@ export function App() {
     setEditor,
   ] = useState<null | monaco.editor.IStandaloneCodeEditor>(null);
 
-  const onInit = useCallback((ed) => {
+  const onInit = useCallback((ed: any) => {
     setEditor(ed);
   }, []);
 

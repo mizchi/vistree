@@ -1,8 +1,8 @@
-import { rewriteSource } from "@mizchi/vistree/src";
+import { replaceNode } from "@mizchi/vistree/src/index";
 import ts from "typescript";
 import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { TEMPLATES } from "../data";
-import { parseCode } from "@mizchi/vistree";
+import { parseCode } from "@mizchi/vistree/src/index";
 
 enum EditMode {
   CodeAndVisual = "code-and-visual",
@@ -37,7 +37,7 @@ export const counter = createSlice({
       state: State,
       action: PayloadAction<{ prev: ts.Node; next: ts.Node }>
     ) {
-      const newAst = rewriteSource(
+      const newAst = replaceNode(
         (state.ast as unknown) as ts.SourceFile,
         action.payload.prev,
         action.payload.next
